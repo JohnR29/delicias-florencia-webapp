@@ -139,7 +139,7 @@ Saludos cordiales.
 }
 
 function sendEmail(emailData) {
-    const mailtoLink = `mailto:deliciasflorencia@email.com?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`;
+    const mailtoLink = `mailto:johnrojas297@gmail.com?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`;
     window.location.href = mailtoLink;
 }
 
