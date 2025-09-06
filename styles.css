@@ -50,62 +50,75 @@
     padding-left: 1.2rem;
 }
 .sabor-cantidad-row {
-    display: flex;
-    align-items: center;
+    --stepper-border: #d7c9cb;
+    --stepper-bg: #fff;
+    --stepper-accent: var(--primary-color);
+    display: inline-flex;
+    align-items: stretch;
     justify-content: center;
-    gap: 0;
     margin-top: 1rem;
-    border: 1px solid #bbb;
-    border-radius: 6px;
+    background: linear-gradient(135deg,var(--accent-color) 0%, #fff 100%);
+    border: 2px solid var(--stepper-border);
+    border-radius: 50px;
     overflow: hidden;
-    width: 160px;
+    min-width: 180px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     margin-left: auto;
     margin-right: auto;
 }
-.sabor-cantidad-row button,
-.sabor-cantidad-row .cantidad {
-    border: none;
-    background: none;
-    font-size: 1.2rem;
-    width: 50px;
-    height: 40px;
-    text-align: center;
-    outline: none;
-}
 .sabor-cantidad-row button {
-    background: #fafafa;
+    appearance: none;
+    border: none;
+    background: #ffffffcc;
+    padding: 0;
+    width: 56px;
+    font-size: 1.4rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s;
-    border-right: 1px solid #bbb;
-    border-left: 1px solid #bbb;
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+    transition: background .25s, color .25s, transform .15s;
     user-select: none;
+    position: relative;
 }
-.sabor-cantidad-row button:hover {
+.sabor-cantidad-row button:hover:not(:disabled),
+.sabor-cantidad-row button:focus-visible:not(:disabled) {
     background: var(--primary-color);
-    color: white;
+    color: #fff;
 }
-.sabor-cantidad-row button:active {
-    transform: scale(0.95);
+.sabor-cantidad-row button:active:not(:disabled) {
+    transform: scale(.9);
 }
 .sabor-cantidad-row button:disabled {
-    opacity: 0.5;
+    opacity: .35;
     cursor: not-allowed;
-    background: #f0f0f0;
-}
-.sabor-cantidad-row button:first-child {
-    border-left: none;
-}
-.sabor-cantidad-row button:last-child {
-    border-right: none;
 }
 .sabor-cantidad-row .cantidad {
-    background: #fff;
-    font-weight: bold;
-    font-size: 1.1rem;
-    border-left: 1px solid #bbb;
-    border-right: 1px solid #bbb;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.15rem;
+    font-variant-numeric: tabular-nums;
+    background: var(--stepper-bg);
+    color: var(--text-dark);
+    min-width: 60px;
+    padding: 0 0.5rem;
     pointer-events: none;
+    position: relative;
+}
+.sabor-cantidad-row .cantidad.bump {
+    animation: bumpScale .3s ease;
+}
+@keyframes bumpScale {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.25); }
+    60% { transform: scale(0.92); }
+    100% { transform: scale(1); }
 }
 /* Mejorar el resumen del carrito */
 .resumen-pedido {
@@ -940,6 +953,27 @@ body {
 /* Scroll suave */
 html {
     scroll-behavior: smooth;
+}
+
+/* Utilidad accesibilidad */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Estados de enfoque visibles */
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid var(--secondary-color);
+    outline-offset: 2px;
+    border-radius: 4px;
 }
 
 /* Estados de carga */

@@ -1,418 +1,235 @@
-// Navegación móvil
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
+// ==========================
+// Constantes de configuración
+// ==========================
+const MINIMO_PEDIDO = 6;
+const UMBRAL_MAYORISTA = 15;
+const PRECIO_NORMAL = 1650;
+const PRECIO_MAYORISTA = 1500;
+const EMAIL_DESTINO = 'deliciasflorencia@email.com'; // TODO: parametrizar
 
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
+// ==========================
+// Utilidades
+// ==========================
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+const getPrecioUnitario = total => total >= UMBRAL_MAYORISTA ? PRECIO_MAYORISTA : PRECIO_NORMAL;
 
-// Cerrar menú al hacer clic en un enlace
-document.querySelectorAll('.nav-link').forEach(n => n.addEventListener('click', () => {
-    hamburger.classList.remove('active');
-    navMenu.classList.remove('active');
-}));
-
-// Fecha mínima (4 días desde hoy)
-const fechaInput = document.getElementById('fecha');
-const today = new Date();
-const minDate = new Date(today);
-minDate.setDate(today.getDate() + 4);
-
-// Formatear fecha para input
-const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
-fechaInput.min = formatDate(minDate);
-
-// Scroll suave para navegación
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-
-
-// --- Carrito visual tipo e-commerce ---
-const saboresData = [
-    {
-        key: 'pina-crema',
-        nombre: 'Piña Crema',
-        precio: 1500,
-        ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar']
-    },
-    {
-        key: 'oreo',
-        nombre: 'Oreo',
-        precio: 1500,
-        ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar', 'Crema']
-    },
-    {
-        key: 'tres-leches',
-        nombre: 'Tres Leches',
-        precio: 1500,
-        ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly']
-    },
-    {
-        key: 'selva-negra',
-        nombre: 'Selva Negra',
-        precio: 1500,
-        ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate']
+// Accesibilidad: actualización discreta de estado
+function announce(msg) {
+    const live = $('#live-updates');
+    if (live) {
+        live.textContent = msg;
     }
-    // Agrega más sabores aquí si lo deseas
-];
+}
 
-const cantidades = {};
-saboresData.forEach(s => {
-    cantidades[s.key] = 0;
-});
+// ==========================
+// Datos (centralizado)
+// ==========================
+const saboresData = Object.freeze([
+    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'] },
+    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'] },
+    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'] },
+    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'] }
+]);
 
+const cantidades = Object.fromEntries(saboresData.map(s => [s.key, 0]));
+
+// ==========================
+// Render dinámico tarjetas pedido
+// ==========================
+function renderSaboresPedido() {
+    const cont = document.getElementById('sabores-pedido');
+    if (!cont) return;
+    cont.innerHTML = saboresData.map(s => {
+        const ingredientes = s.ingredientes.map(i => `<li>${i}</li>`).join('');
+        return `
+        <div class="sabor-card-pedido" data-sabor="${s.key}">
+            <h3>${s.nombre}</h3>
+            <div class="sabor-img-ingredientes">
+                <div class="sabor-img-placeholder" aria-hidden="true"></div>
+                <div class="sabor-ingredientes">
+                    <strong>Ingredientes:</strong>
+                    <ul>${ingredientes}</ul>
+                </div>
+            </div>
+            <div class="sabor-cantidad-row">
+                <button type="button" class="menos-btn" aria-label="Restar ${s.nombre}">-</button>
+                <span class="cantidad" aria-live="off">0</span>
+                <button type="button" class="mas-btn" aria-label="Sumar ${s.nombre}">+</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ==========================
+// Render y estado carrito
+// ==========================
 function actualizarResumen() {
-    // Actualizar cantidades en las tarjetas
-    document.querySelectorAll('.sabor-card-pedido').forEach(card => {
+    const cards = $$('.sabor-card-pedido');
+    let totalCantidad = 0;
+
+    cards.forEach(card => {
         const key = card.getAttribute('data-sabor');
         const cantidadSpan = card.querySelector('.cantidad');
+        const menosBtn = card.querySelector('.menos-btn');
+        const val = cantidades[key] || 0;
+        if (cantidadSpan) cantidadSpan.textContent = val;
+        if (menosBtn) menosBtn.disabled = val === 0;
+        // Animación bump
         if (cantidadSpan) {
-            cantidadSpan.textContent = cantidades[key] || 0;
+            cantidadSpan.classList.remove('bump');
+            void cantidadSpan.offsetWidth; // reflow para reiniciar animación
+            cantidadSpan.classList.add('bump');
         }
+        totalCantidad += val;
     });
 
-    // Actualizar resumen visual SOLO con sabores con cantidad > 0
-    const resumenLista = document.getElementById('resumen-lista');
+    const resumenLista = $('#resumen-lista');
     if (resumenLista) {
         resumenLista.innerHTML = '';
-        let totalCantidad = 0;
-        let total = 0;
-        
-        saboresData.forEach(sabor => {
-            if (cantidades[sabor.key] > 0) {
+        saboresData.forEach(s => {
+            if (cantidades[s.key] > 0) {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${sabor.nombre}</span> <span>x ${cantidades[sabor.key]}</span>`;
+                li.innerHTML = `<span>${s.nombre}</span><span>x ${cantidades[s.key]}</span>`;
                 resumenLista.appendChild(li);
-                totalCantidad += cantidades[sabor.key];
-                total += cantidades[sabor.key] * sabor.precio;
             }
         });
-        
-        // Actualizar totales
-        const resumenPrecioUnitario = document.getElementById('resumen-precio-unitario');
-        const resumenTotalCantidad = document.getElementById('resumen-total-cantidad');
-        const resumenTotal = document.getElementById('resumen-total');
-        
-        if (resumenPrecioUnitario) {
-            const precioUnitario = totalCantidad >= 15 ? 1500 : 1650;
-            resumenPrecioUnitario.textContent = `$${precioUnitario.toLocaleString('es-CL')}`;
-        }
-        if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
-        if (resumenTotal) {
-            const precioUnitario = totalCantidad >= 15 ? 1500 : 1650;
-            const totalFinal = totalCantidad * precioUnitario;
-            resumenTotal.textContent = `$${totalFinal.toLocaleString('es-CL')}`;
-        }
-        
-        // Habilitar/deshabilitar botón de solicitar pedido
-        const btnSolicitar = document.getElementById('btn-solicitar-pedido');
-        if (btnSolicitar) {
-            btnSolicitar.disabled = totalCantidad < 6;
-            if (totalCantidad < 6) {
-                btnSolicitar.textContent = `Mínimo 6 unidades (${totalCantidad}/6)`;
-                btnSolicitar.style.opacity = '0.6';
-            } else {
-                btnSolicitar.textContent = 'Solicitar pedido';
-                btnSolicitar.style.opacity = '1';
-            }
-        }
     }
+
+    // Totales
+    const precioUnitario = getPrecioUnitario(totalCantidad);
+    const totalFinal = totalCantidad * precioUnitario;
+    const resumenPrecioUnitario = $('#resumen-precio-unitario');
+    const resumenTotalCantidad = $('#resumen-total-cantidad');
+    const resumenTotal = $('#resumen-total');
+    if (resumenPrecioUnitario) resumenPrecioUnitario.textContent = `$${precioUnitario.toLocaleString('es-CL')}`;
+    if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
+    if (resumenTotal) resumenTotal.textContent = `$${totalFinal.toLocaleString('es-CL')}`;
+
+    // Botón
+    const btnSolicitar = $('#btn-solicitar-pedido');
+    if (btnSolicitar) {
+        const habilitado = totalCantidad >= MINIMO_PEDIDO;
+        btnSolicitar.disabled = !habilitado;
+        btnSolicitar.setAttribute('aria-disabled', String(!habilitado));
+        btnSolicitar.textContent = habilitado ? 'Solicitar pedido' : `Mínimo ${MINIMO_PEDIDO} unidades (${totalCantidad}/${MINIMO_PEDIDO})`;
+    }
+
+    announce(`Total ${totalCantidad} unidades. Precio unitario ${precioUnitario}. Total ${totalFinal}`);
 }
 
-// Inicializar eventos de botones
-function inicializarBotonesCantidad() {
-    document.querySelectorAll('.sabor-card-pedido').forEach(card => {
+// Delegación de eventos para + / -
+function configurarDelegacionCantidad() {
+    const contenedor = $('.sabores-cards');
+    if (!contenedor) return;
+    contenedor.addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const card = btn.closest('.sabor-card-pedido');
+        if (!card) return;
         const key = card.getAttribute('data-sabor');
-        const menosBtn = card.querySelector('.menos-btn');
-        const masBtn = card.querySelector('.mas-btn');
-        
-        // Remover event listeners existentes para evitar duplicados
-        menosBtn.replaceWith(menosBtn.cloneNode(true));
-        masBtn.replaceWith(masBtn.cloneNode(true));
-        
-        // Obtener referencias actualizadas
-        const nuevoMenosBtn = card.querySelector('.menos-btn');
-        const nuevoMasBtn = card.querySelector('.mas-btn');
-        
-        nuevoMenosBtn.addEventListener('click', (e) => {
-            e.preventDefault();
+        if (!key) return;
+        if (btn.classList.contains('mas-btn')) {
+            cantidades[key] = (cantidades[key] || 0) + 1;
+            actualizarResumen();
+        } else if (btn.classList.contains('menos-btn')) {
             if (cantidades[key] > 0) {
-                cantidades[key]--;
+                cantidades[key] -= 1;
                 actualizarResumen();
             }
-        });
-        
-        nuevoMasBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            cantidades[key]++;
-            actualizarResumen();
-        });
+        }
     });
 }
 
-// Inicializar botones cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    inicializarBotonesCantidad();
-    actualizarResumen();
-});
-
-// Mejorar el event listener del botón solicitar pedido
-document.addEventListener('DOMContentLoaded', function() {
-    const btnSolicitarPedido = document.getElementById('btn-solicitar-pedido');
-    if (btnSolicitarPedido) {
-        btnSolicitarPedido.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Construir resumen para mailto
-            const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
-            
-            if (totalCantidad < 6) {
-                alert('La cantidad mínima es 6 unidades en total.');
-                return;
-            }
-            
-            // Verificar que hay al menos un sabor seleccionado
-            const saboresSeleccionados = saboresData.filter(sabor => cantidades[sabor.key] > 0);
-            if (saboresSeleccionados.length === 0) {
-                alert('Debes seleccionar al menos un sabor.');
-                return;
-            }
-            
-            // Calcular precio unitario basado en cantidad
-            const precioUnitario = totalCantidad >= 15 ? 1500 : 1650;
-            const totalPrecio = totalCantidad * precioUnitario;
-            
-            let body = 'Pedido de cotización:%0D%0A%0D%0A';
-            saboresSeleccionados.forEach(sabor => {
-                body += `- ${sabor.nombre}: ${cantidades[sabor.key]} unidad(es)%0D%0A`;
-            });
-            body += `%0D%0ATotal unidades: ${totalCantidad}%0D%0A`;
-            body += `Precio unitario: $${precioUnitario.toLocaleString('es-CL')}%0D%0A`;
-            body += `Total: $${totalPrecio.toLocaleString('es-CL')}%0D%0A`;
-            body += `%0D%0A¡Revisar y contactar al cliente!`;
-            
-            const subject = `Nueva cotización web (${totalCantidad} unidades)`;
-            const destinatario = 'deliciasflorencia@email.com'; // Cambia por el correo real
-            
-            const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(subject)}&body=${body}`;
-            window.location.href = mailtoUrl;
-            
-            // Mostrar mensaje de confirmación
-            mostrarMensajeExito();
+function configurarBotonSolicitar() {
+    const btn = $('#btn-solicitar-pedido');
+    if (!btn) return;
+    btn.addEventListener('click', e => {
+        e.preventDefault();
+        const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
+        if (totalCantidad < MINIMO_PEDIDO) return; // botón ya deshabilita
+        const precioUnitario = getPrecioUnitario(totalCantidad);
+        const totalFinal = totalCantidad * precioUnitario;
+        const saboresSeleccionados = saboresData.filter(s => cantidades[s.key] > 0);
+        if (!saboresSeleccionados.length) return;
+        let body = 'Pedido de cotización:%0D%0A%0D%0A';
+        saboresSeleccionados.forEach(s => {
+            body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
         });
-    }
-});
+        body += `%0D%0ATotal unidades: ${totalCantidad}%0D%0A`;
+        body += `Precio unitario: $${precioUnitario.toLocaleString('es-CL')}%0D%0A`;
+        body += `Total: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
+        body += `%0D%0AOrigen: Sitio Web Delicias Florencia`;
+        const subject = `Cotización web (${totalCantidad} uds)`;
+        const mailtoUrl = `mailto:${EMAIL_DESTINO}?subject=${encodeURIComponent(subject)}&body=${body}`;
+        window.location.href = mailtoUrl;
+        mostrarMensajeExito();
+    });
+}
 
 function mostrarMensajeExito() {
-    // Crear mensaje de éxito temporal
     const mensaje = document.createElement('div');
-    mensaje.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: var(--secondary-color);
-        color: white;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        z-index: 10000;
-        text-align: center;
-        font-weight: 600;
-    `;
-    mensaje.innerHTML = `
-        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-        ¡Solicitud enviada!<br>
-        <small>Se abrirá tu cliente de correo</small>
-    `;
-    
+    mensaje.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--secondary-color);color:#fff;padding:1.5rem 2rem;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:10000;font-weight:600;text-align:center;`;
+    mensaje.innerHTML = '<i class="fas fa-check-circle" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>¡Solicitud preparada!<br><small>Abriendo correo…</small>';
     document.body.appendChild(mensaje);
-    
-    // Remover mensaje después de 3 segundos
-    setTimeout(() => {
-        mensaje.remove();
-    }, 3000);
+    setTimeout(() => mensaje.remove(), 3000);
 }
 
-// Formulario de cotización
-document.getElementById('cotizacionForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    const data = Object.fromEntries(formData);
-    let total = 0;
-    try {
-        const sabores = JSON.parse(data['sabores-carrito'] || '[]');
-        total = sabores.reduce((acc, s) => acc + parseInt(s.cantidad), 0);
-        if (total < 6) {
-            alert('La cantidad mínima es 6 unidades en total.');
-            return;
-        }
-        if (sabores.length === 0) {
-            alert('Agrega al menos un sabor.');
-            return;
-        }
-        // Preparar mailto con los datos del carrito
-        const mailto = buildMailtoPedido(data, sabores);
-        window.location.href = mailto;
-        showSuccessMessage();
-    } catch (err) {
-        alert('Error en la selección de sabores.');
-    }
-});
-
-function validateForm(data, sabores) {
-    // Validar cantidad mínima
-    if (parseInt(data.cantidad) < 6) {
-        alert('La cantidad mínima es 6 unidades');
-        return false;
-    }
-    
-    // Validar que se haya seleccionado al menos un sabor
-    if (sabores.length === 0) {
-        alert('Debes seleccionar al menos un sabor');
-        return false;
-    }
-    
-    // Validar fecha
-    const selectedDate = new Date(data.fecha);
-    const minDate = new Date();
-    minDate.setDate(minDate.getDate() + 4);
-    
-    if (selectedDate < minDate) {
-        alert('La fecha debe ser con mínimo 4 días de anticipación');
-        return false;
-    }
-    
-    return true;
-}
-
-
-function buildMailtoPedido(data, sabores) {
-    const destinatario = 'deliciasflorencia@email.com'; // Cambia por el correo real del negocio
-    let subject = `Nueva cotización de ${data.telefono || 'cliente web'}`;
-    let body = `¡Nuevo pedido de cotización!%0D%0A%0D%0A`;
-    body += `Nombre: ${data.nombre || ''}%0D%0A`;
-    body += `Teléfono: ${data.telefono || ''}%0D%0A`;
-    body += `Fecha deseada: ${data.fecha || ''}%0D%0A`;
-    body += `Dirección: ${data.direccion || ''}%0D%0A`;
-    body += `Comentarios: ${data.comentarios || ''}%0D%0A%0D%0A`;
-    body += `Sabores y cantidades:%0D%0A`;
-    sabores.forEach(s => {
-        body += `- ${s.saborNombre}: ${s.cantidad} unidad(es)%0D%0A`;
+// Navegación móvil accesible
+function configurarNav() {
+    const hamburger = $('.hamburger');
+    const navMenu = $('.nav-menu');
+    if (!hamburger || !navMenu) return;
+    hamburger.addEventListener('click', () => {
+        const active = navMenu.classList.toggle('active');
+        hamburger.classList.toggle('active', active);
+        hamburger.setAttribute('aria-expanded', String(active));
     });
-    body += `%0D%0A¡Revisar y contactar al cliente!`;
-    return `mailto:${destinatario}?subject=${encodeURIComponent(subject)}&body=${body}`;
+    $$('.nav-link').forEach(link => link.addEventListener('click', () => {
+        navMenu.classList.remove('active');
+        hamburger.classList.remove('active');
+        hamburger.setAttribute('aria-expanded', 'false');
+    }));
 }
 
-function showSuccessMessage() {
-    // Crear mensaje de éxito
-    const successDiv = document.createElement('div');
-    successDiv.className = 'success-message';
-    successDiv.innerHTML = `
-        <i class="fas fa-check-circle"></i>
-        ¡Cotización enviada! Te contactaremos pronto.
-    `;
-    
-    // Agregar después del formulario
-    const form = document.getElementById('cotizacionForm');
-    form.parentNode.insertBefore(successDiv, form.nextSibling);
-    
-    // Limpiar formulario
-    form.reset();
-    
-    // Remover mensaje después de 5 segundos
-    setTimeout(() => {
-        successDiv.remove();
-    }, 5000);
-}
-
-// Calcular precio en tiempo real
-document.getElementById('cantidad').addEventListener('input', function() {
-    const cantidad = parseInt(this.value) || 0;
-    updatePriceDisplay(cantidad);
-});
-
-function updatePriceDisplay(cantidad) {
-    // Encontrar elementos donde mostrar el precio
-    const priceElements = document.querySelectorAll('.precio-calculado');
-    
-    if (cantidad >= 6) {
-        const precioUnitario = cantidad >= 15 ? 1500 : 1650;
-        const total = cantidad * precioUnitario;
-        
-        priceElements.forEach(el => {
-            el.textContent = `${cantidad} unidades × $${precioUnitario} = $${total.toLocaleString()}`;
+// Scroll suave (progressive enhancement)
+function configurarScrollSuave() {
+    $$("a[href^='#']").forEach(a => {
+        a.addEventListener('click', ev => {
+            const href = a.getAttribute('href');
+            if (!href) return;
+            const target = document.querySelector(href);
+            if (!target) return;
+            ev.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
-    } else {
-        priceElements.forEach(el => {
-            el.textContent = '';
-        });
-    }
+    });
 }
-
-// Agregar elemento para mostrar precio calculado
-document.addEventListener('DOMContentLoaded', function() {
-    const cantidadInput = document.getElementById('cantidad');
-    const priceDisplay = document.createElement('div');
-    priceDisplay.className = 'precio-calculado';
-    priceDisplay.style.cssText = `
-        margin-top: 0.5rem;
-        padding: 0.8rem;
-        background: var(--accent-color);
-        border-radius: 8px;
-        font-weight: 600;
-        color: var(--primary-color);
-        text-align: center;
-    `;
-    
-    cantidadInput.parentNode.appendChild(priceDisplay);
-});
 
 // Animaciones al hacer scroll
-const observeElements = () => {
-    const elements = document.querySelectorAll('.sabor-card, .precio-card, .info-card');
-    
-    const observer = new IntersectionObserver((entries) => {
+function configurarAnimaciones() {
+    const elements = $$('.sabor-card, .precio-card, .info-card');
+    if (!('IntersectionObserver' in window)) return; // fallback silencioso
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.animationDelay = `${Math.random() * 0.3}s`;
+                entry.target.style.animationDelay = `${(Math.random() * 0.3).toFixed(2)}s`;
                 entry.target.classList.add('animate');
             }
         });
-    }, {
-        threshold: 0.1
-    });
-    
+    }, { threshold: 0.1 });
     elements.forEach(el => observer.observe(el));
-};
+}
 
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', observeElements);
-
-// Efecto parallax suave para el hero
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const parallax = document.querySelector('.hero');
-    if (parallax) {
-        const speed = scrolled * 0.5;
-        parallax.style.transform = `translateY(${speed}px)`;
-    }
+// Inicialización principal
+document.addEventListener('DOMContentLoaded', () => {
+    configurarNav();
+    renderSaboresPedido();
+    configurarDelegacionCantidad();
+    configurarBotonSolicitar();
+    configurarScrollSuave();
+    configurarAnimaciones();
+    actualizarResumen();
 });
+
+// (Opcional) Parallax deshabilitado para evitar mareo / rendimiento; si se quiere, habilitar con prefers-reduced-motion check.

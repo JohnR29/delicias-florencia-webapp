@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Delicias Florencia: tortas caseras en vaso artesanales. Sabores, precios por cantidad y entrega a domicilio en la Región Metropolitana.">
     <title>Delicias Florencia - Tortas Caseras en Vaso</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -16,18 +17,18 @@
                 <div class="logo">
                     <img src="logo-delicias-florencia.png" alt="Delicias Florencia" class="logo-img">
                 </div>
-                <ul class="nav-menu">
+                <ul class="nav-menu" id="primary-navigation">
                     <li><a href="#inicio" class="nav-link">Inicio</a></li>
                     <li><a href="#sabores" class="nav-link">Sabores</a></li>
                     <li><a href="#precios" class="nav-link">Precios</a></li>
                     <li><a href="#cobertura" class="nav-link">Cobertura</a></li>
                     <li><a href="#cotizar" class="nav-link">Cotizar</a></li>
                 </ul>
-                <div class="hamburger">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                </div>
+                <button type="button" class="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="primary-navigation">
+                    <span class="bar" aria-hidden="true"></span>
+                    <span class="bar" aria-hidden="true"></span>
+                    <span class="bar" aria-hidden="true"></span>
+                </button>
             </div>
         </nav>
     </header>
@@ -42,7 +43,7 @@
         </div>
         <div class="hero-image">
             <div class="hero-cake-showcase">
-                <img src="torta1.jpg" alt="Tortas Delicias Florencia" class="hero-cake">
+                <img src="torta1.jpg" alt="Tortas artesanales Delicias Florencia en vaso" class="hero-cake" decoding="async">
             </div>
         </div>
     </section>
@@ -56,7 +57,7 @@
             <div class="sabores-grid">
                 <div class="sabor-card">
                     <div class="sabor-image">
-                        <img src="tres-leches.jpg" alt="Torta Tres Leches">
+                        <img src="tres-leches.jpg" alt="Torta Tres Leches artesanal" loading="lazy" decoding="async">
                     </div>
                     <div class="sabor-content">
                         <h3>Tres Leches</h3>
@@ -66,7 +67,7 @@
 
                 <div class="sabor-card">
                     <div class="sabor-image">
-                        <img src="selva-negra.jpg" alt="Torta Selva Negra">
+                        <img src="selva-negra.jpg" alt="Torta Selva Negra con cerezas" loading="lazy" decoding="async">
                     </div>
                     <div class="sabor-content">
                         <h3>Selva Negra</h3>
@@ -76,7 +77,7 @@
 
                 <div class="sabor-card">
                     <div class="sabor-image">
-                        <img src="oreo.jpg" alt="Torta Oreo">
+                        <img src="oreo.jpg" alt="Torta Oreo con crema" loading="lazy" decoding="async">
                     </div>
                     <div class="sabor-content">
                         <h3>Oreo</h3>
@@ -85,7 +86,7 @@
                 </div>
                 <div class="sabor-card">
                     <div class="sabor-image">
-                        <img src="pina-crema.jpg" alt="Torta Piña Crema">
+                        <img src="pina-crema.jpg" alt="Torta Piña Crema con manjar" loading="lazy" decoding="async">
                     </div>
                     <div class="sabor-content">
                         <h3>Piña Crema</h3>
@@ -200,100 +201,18 @@
 
     <!-- Cotización Section -->
     <section id="cotizar" class="cotizar cotizar-grid">
-        <div class="sabores-cards">
-            <!-- Tarjeta de sabor: ejemplo, duplicar para cada sabor -->
-            <div class="sabor-card-pedido" data-sabor="pina-crema">
-                <h3>Piña Crema</h3>
-                <div class="sabor-img-ingredientes">
-                    <div class="sabor-img-placeholder"></div>
-                    <div class="sabor-ingredientes">
-                        <strong>Ingredientes:</strong>
-                        <ul>
-                            <li>Bizcocho Blanco</li>
-                            <li>Piña</li>
-                            <li>Crema</li>
-                            <li>Manjar</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="sabor-cantidad-row">
-                    <button type="button" class="menos-btn">-</button>
-                    <span class="cantidad">0</span>
-                    <button type="button" class="mas-btn">+</button>
-                </div>
-            </div>
-            <div class="sabor-card-pedido" data-sabor="oreo">
-                <h3>Oreo</h3>
-                <div class="sabor-img-ingredientes">
-                    <div class="sabor-img-placeholder"></div>
-                    <div class="sabor-ingredientes">
-                        <strong>Ingredientes:</strong>
-                        <ul>
-                            <li>Bizcocho Chocolate</li>
-                            <li>Crema</li>
-                            <li>Galleta Oreo</li>
-                            <li>Manjar</li>
-                            <li>Crema</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="sabor-cantidad-row">
-                    <button type="button" class="menos-btn">-</button>
-                    <span class="cantidad">0</span>
-                    <button type="button" class="mas-btn">+</button>
-                </div>
-            </div>
-            <div class="sabor-card-pedido" data-sabor="tres-leches">
-                <h3>Tres Leches</h3>
-                <div class="sabor-img-ingredientes">
-                    <div class="sabor-img-placeholder"></div>
-                    <div class="sabor-ingredientes">
-                        <strong>Ingredientes:</strong>
-                        <ul>
-                            <li>Bizcocho Blanco</li>
-                            <li>Tres tipos de leche</li>
-                            <li>Crema Chantilly</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="sabor-cantidad-row">
-                    <button type="button" class="menos-btn">-</button>
-                    <span class="cantidad">0</span>
-                    <button type="button" class="mas-btn">+</button>
-                </div>
-            </div>
-            <div class="sabor-card-pedido" data-sabor="selva-negra">
-                <h3>Selva Negra</h3>
-                <div class="sabor-img-ingredientes">
-                    <div class="sabor-img-placeholder"></div>
-                    <div class="sabor-ingredientes">
-                        <strong>Ingredientes:</strong>
-                        <ul>
-                            <li>Bizcocho Chocolate</li>
-                            <li>Cerezas</li>
-                            <li>Crema Chantilly</li>
-                            <li>Virutas de chocolate</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="sabor-cantidad-row">
-                    <button type="button" class="menos-btn">-</button>
-                    <span class="cantidad">0</span>
-                    <button type="button" class="mas-btn">+</button>
-                </div>
-            </div>
-            <!-- Agrega más tarjetas aquí siguiendo el mismo formato -->
-        </div>
+    <div class="sabores-cards" id="sabores-pedido" data-dinamico="true"><!-- Tarjetas generadas dinámicamente --></div>
         <div class="resumen-pedido">
             <h3>Resumen</h3>
             <ul id="resumen-lista"></ul>
-            <div class="resumen-totales">
-                <span id="resumen-precio-unitario">$1.500</span>
+            <div class="resumen-totales" aria-live="polite">
+                <span id="resumen-precio-unitario" data-default="$1.650">$1.650</span>
                 <span>* <span id="resumen-total-cantidad">0</span></span>
                 <span>Total</span>
                 <span id="resumen-total">$0</span>
             </div>
-            <button id="btn-solicitar-pedido" class="submit-button" style="margin-top:1rem;">Solicitar pedido</button>
+            <button id="btn-solicitar-pedido" class="submit-button" style="margin-top:1rem;" aria-disabled="true">Solicitar pedido</button>
+            <div id="live-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
         </div>
     </section>
 
