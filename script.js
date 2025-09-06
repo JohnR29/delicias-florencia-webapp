@@ -44,45 +44,100 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 
-// Carrito de sabores para cotización
-const carritoSabores = [];
-const saborSelect = document.getElementById('sabor-select');
-const saborCantidad = document.getElementById('sabor-cantidad');
-const agregarSaborBtn = document.getElementById('agregar-sabor');
-const carritoLista = document.getElementById('carrito-sabores-lista');
-const saboresCarritoInput = document.getElementById('sabores-carrito');
 
-function renderCarritoSabores() {
-    carritoLista.innerHTML = '';
-    carritoSabores.forEach((item, idx) => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span><strong>${item.saborNombre}</strong> - ${item.cantidad} unidad(es)</span> <button type="button" class="eliminar-sabor" data-idx="${idx}">Eliminar</button>`;
-        carritoLista.appendChild(li);
+// --- Carrito visual tipo e-commerce ---
+const saboresData = [
+    {
+        key: 'pina-crema',
+        nombre: 'Piña Crema',
+        precio: 1500,
+        ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar']
+    },
+    {
+        key: 'oreo',
+        nombre: 'Oreo',
+        precio: 1500,
+        ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar', 'Crema']
+    },
+    {
+        key: 'tres-leches',
+        nombre: 'Tres Leches',
+        precio: 1500,
+        ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly']
+    },
+    {
+        key: 'selva-negra',
+        nombre: 'Selva Negra',
+        precio: 1500,
+        ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate']
+    }
+    // Agrega más sabores aquí si lo deseas
+];
+
+const cantidades = {};
+saboresData.forEach(s => cantidades[s.key] = 0);
+
+function actualizarResumen() {
+    const resumenLista = document.getElementById('resumen-lista');
+    const resumenPrecioUnitario = document.getElementById('resumen-precio-unitario');
+    const resumenTotalCantidad = document.getElementById('resumen-total-cantidad');
+    const resumenTotal = document.getElementById('resumen-total');
+    resumenLista.innerHTML = '';
+    let total = 0;
+    let totalCantidad = 0;
+    saboresData.forEach(sabor => {
+        if (cantidades[sabor.key] > 0) {
+            const li = document.createElement('li');
+            li.innerHTML = `${sabor.nombre} <span>* ${cantidades[sabor.key]}</span>`;
+            resumenLista.appendChild(li);
+            total += cantidades[sabor.key] * sabor.precio;
+            totalCantidad += cantidades[sabor.key];
+        }
     });
-    saboresCarritoInput.value = JSON.stringify(carritoSabores);
+    resumenPrecioUnitario.textContent = `$1.500`;
+    resumenTotalCantidad.textContent = totalCantidad;
+    resumenTotal.textContent = `$${total.toLocaleString()}`;
 }
 
-agregarSaborBtn.addEventListener('click', () => {
-    const sabor = saborSelect.value;
-    const cantidad = parseInt(saborCantidad.value);
-    if (!sabor || cantidad < 1) return;
-    const saborNombre = saborSelect.options[saborSelect.selectedIndex].text;
-    // Si ya existe, suma cantidad
-    const existente = carritoSabores.find(item => item.sabor === sabor);
-    if (existente) {
-        existente.cantidad += cantidad;
-    } else {
-        carritoSabores.push({ sabor, saborNombre, cantidad });
-    }
-    renderCarritoSabores();
+document.querySelectorAll('.sabor-card-pedido').forEach(card => {
+    const key = card.getAttribute('data-sabor');
+    const menosBtn = card.querySelector('.menos-btn');
+    const masBtn = card.querySelector('.mas-btn');
+    const cantidadSpan = card.querySelector('.cantidad');
+    menosBtn.addEventListener('click', () => {
+        if (cantidades[key] > 0) {
+            cantidades[key]--;
+            cantidadSpan.textContent = cantidades[key];
+            actualizarResumen();
+        }
+    });
+    masBtn.addEventListener('click', () => {
+        cantidades[key]++;
+        cantidadSpan.textContent = cantidades[key];
+        actualizarResumen();
+    });
 });
 
-carritoLista.addEventListener('click', (e) => {
-    if (e.target.classList.contains('eliminar-sabor')) {
-        const idx = parseInt(e.target.getAttribute('data-idx'));
-        carritoSabores.splice(idx, 1);
-        renderCarritoSabores();
+actualizarResumen();
+
+document.getElementById('btn-solicitar-pedido').addEventListener('click', function() {
+    // Construir resumen para mailto
+    const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
+    if (totalCantidad < 6) {
+        alert('La cantidad mínima es 6 unidades en total.');
+        return;
     }
+    let body = 'Pedido de cotización:%0D%0A%0D%0A';
+    saboresData.forEach(sabor => {
+        if (cantidades[sabor.key] > 0) {
+            body += `- ${sabor.nombre}: ${cantidades[sabor.key]} unidad(es)%0D%0A`;
+        }
+    });
+    body += `%0D%0ATotal: $${(totalCantidad*1500).toLocaleString()}%0D%0A`;
+    body += `%0D%0A¡Revisar y contactar al cliente!`;
+    const subject = `Nueva cotización web (${totalCantidad} unidades)`;
+    const destinatario = 'deliciasflorencia@email.com'; // Cambia por el correo real
+    window.location.href = `mailto:${destinatario}?subject=${encodeURIComponent(subject)}&body=${body}`;
 });
 
 // Formulario de cotización

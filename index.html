@@ -199,75 +199,100 @@
     </section>
 
     <!-- Cotización Section -->
-    <section id="cotizar" class="cotizar">
-        <div class="container">
-            <h2 class="section-title">Solicita tu Cotización</h2>
-            <p class="section-subtitle">Completa el formulario y te contactaremos con tu cotización personalizada</p>
-            
-            <div class="cotizar-content">
-                <div class="cotizar-info">
-                    <div class="info-card">
-                        <i class="fas fa-clock"></i>
-                        <h4>Tiempo de Preparación</h4>
-                        <p>Trabajamos con un mínimo de <strong>4 días</strong> de anticipación para garantizar la mejor calidad</p>
-                    </div>
-                    <div class="info-card">
-                        <i class="fas fa-envelope"></i>
-                        <h4>Respuesta Rápida</h4>
-                        <p>Recibirás tu cotización por email en menos de 24 horas</p>
-                    </div>
-                    <div class="info-card">
-                        <i class="fas fa-palette"></i>
-                        <h4>Personalización</h4>
-                        <p>Puedes combinar sabores según tus preferencias</p>
+    <section id="cotizar" class="cotizar cotizar-grid">
+        <div class="sabores-cards">
+            <!-- Tarjeta de sabor: ejemplo, duplicar para cada sabor -->
+            <div class="sabor-card-pedido" data-sabor="pina-crema">
+                <h3>Piña Crema</h3>
+                <div class="sabor-img-ingredientes">
+                    <div class="sabor-img-placeholder"></div>
+                    <div class="sabor-ingredientes">
+                        <strong>Ingredientes:</strong>
+                        <ul>
+                            <li>Bizcocho Blanco</li>
+                            <li>Piña</li>
+                            <li>Crema</li>
+                            <li>Manjar</li>
+                        </ul>
                     </div>
                 </div>
-
-                <form class="cotizar-form" id="cotizacionForm">
-                    <div class="form-group">
-                        <label for="sabor-select">Selecciona sabor y cantidad *</label>
-                        <div class="carrito-sabores-row">
-                            <select id="sabor-select">
-                                <option value="tres-leches">Tres Leches</option>
-                                <option value="selva-negra">Selva Negra</option>
-                                <option value="oreo">Oreo</option>
-                                <option value="pina-crema">Piña Crema</option>
-                            </select>
-                            <input type="number" id="sabor-cantidad" min="1" value="1" style="width:80px; margin-left:10px;">
-                            <button type="button" id="agregar-sabor" style="margin-left:10px;">Agregar</button>
-                        </div>
-                        <small>Agrega los sabores y cantidades que desees. Mínimo total: 6 unidades.</small>
-                        <ul id="carrito-sabores-lista" class="carrito-sabores-lista"></ul>
-                        <input type="hidden" id="sabores-carrito" name="sabores-carrito">
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="telefono">Teléfono *</label>
-                            <input type="tel" id="telefono" name="telefono" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="fecha">Fecha deseada *</label>
-                            <input type="date" id="fecha" name="fecha" required>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="direccion">Dirección de entrega *</label>
-                        <textarea id="direccion" name="direccion" rows="3" placeholder="Ingresa tu dirección completa incluyendo comuna" required></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="comentarios">Comentarios adicionales</label>
-                        <textarea id="comentarios" name="comentarios" rows="3" placeholder="Ocasión especial, preferencias adicionales, etc."></textarea>
-                    </div>
-
-                    <button type="submit" class="submit-button">
-                        <i class="fas fa-paper-plane"></i>
-                        Enviar Cotización
-                    </button>
-                </form>
+                <div class="sabor-cantidad-row">
+                    <button type="button" class="menos-btn">-</button>
+                    <span class="cantidad">0</span>
+                    <button type="button" class="mas-btn">+</button>
+                </div>
             </div>
+            <div class="sabor-card-pedido" data-sabor="oreo">
+                <h3>Oreo</h3>
+                <div class="sabor-img-ingredientes">
+                    <div class="sabor-img-placeholder"></div>
+                    <div class="sabor-ingredientes">
+                        <strong>Ingredientes:</strong>
+                        <ul>
+                            <li>Bizcocho Chocolate</li>
+                            <li>Crema</li>
+                            <li>Galleta Oreo</li>
+                            <li>Manjar</li>
+                            <li>Crema</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="sabor-cantidad-row">
+                    <button type="button" class="menos-btn">-</button>
+                    <span class="cantidad">0</span>
+                    <button type="button" class="mas-btn">+</button>
+                </div>
+            </div>
+            <div class="sabor-card-pedido" data-sabor="tres-leches">
+                <h3>Tres Leches</h3>
+                <div class="sabor-img-ingredientes">
+                    <div class="sabor-img-placeholder"></div>
+                    <div class="sabor-ingredientes">
+                        <strong>Ingredientes:</strong>
+                        <ul>
+                            <li>Bizcocho Blanco</li>
+                            <li>Tres tipos de leche</li>
+                            <li>Crema Chantilly</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="sabor-cantidad-row">
+                    <button type="button" class="menos-btn">-</button>
+                    <span class="cantidad">0</span>
+                    <button type="button" class="mas-btn">+</button>
+                </div>
+            </div>
+            <div class="sabor-card-pedido" data-sabor="selva-negra">
+                <h3>Selva Negra</h3>
+                <div class="sabor-img-ingredientes">
+                    <div class="sabor-img-placeholder"></div>
+                    <div class="sabor-ingredientes">
+                        <strong>Ingredientes:</strong>
+                        <ul>
+                            <li>Bizcocho Chocolate</li>
+                            <li>Cerezas</li>
+                            <li>Crema Chantilly</li>
+                            <li>Virutas de chocolate</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="sabor-cantidad-row">
+                    <button type="button" class="menos-btn">-</button>
+                    <span class="cantidad">0</span>
+                    <button type="button" class="mas-btn">+</button>
+                </div>
+            </div>
+            <!-- Agrega más tarjetas aquí siguiendo el mismo formato -->
+        </div>
+        <div class="resumen-pedido">
+            <h3>Resumen</h3>
+            <ul id="resumen-lista"></ul>
+            <hr>
+            <div class="resumen-totales">
+                <div><span id="resumen-precio-unitario"></span> x <span id="resumen-total-cantidad"></span></div>
+                <div>Total<br><strong id="resumen-total"></strong></div>
+            </div>
+            <button id="btn-solicitar-pedido" class="submit-button" style="margin-top:1rem;">Solicitar pedido</button>
         </div>
     </section>
 

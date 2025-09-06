@@ -1,3 +1,97 @@
+.cotizar-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: flex-start;
+}
+.sabores-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.sabor-card-pedido {
+    border: 2px solid #bbb;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.sabor-card-pedido h3 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.sabor-img-ingredientes {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+.sabor-img-placeholder {
+    width: 100px;
+    height: 120px;
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+.sabor-ingredientes ul {
+    margin: 0.5rem 0 0 0;
+    padding-left: 1.2rem;
+}
+.sabor-cantidad-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.sabor-cantidad-row button {
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    border: 1px solid #bbb;
+    background: #fafafa;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.sabor-cantidad-row button:hover {
+    background: #e8b4b8;
+    color: #fff;
+}
+.sabor-cantidad-row .cantidad {
+    min-width: 32px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+.resumen-pedido {
+    border: 2px solid #bbb;
+    border-radius: 8px;
+    background: #fff;
+    padding: 1rem 1.5rem;
+    min-width: 250px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.resumen-pedido h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+#resumen-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+}
+#resumen-lista li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+}
+.resumen-totales {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
 /* Reset y Variables */
 * {
     margin: 0;
