@@ -571,30 +571,39 @@ body {
     display: block;
 }
 
-.sabores-checkboxes {
+
+.carrito-sabores-row {
     display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
+    align-items: center;
+    gap: 0.5rem;
     margin-bottom: 1rem;
 }
 
-.checkbox-label {
+.carrito-sabores-lista {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+}
+.carrito-sabores-lista li {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 8px;
-    transition: var(--transition);
-}
-
-.checkbox-label:hover {
+    justify-content: space-between;
     background: var(--accent-color);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
 }
-
-.checkbox-label input[type="checkbox"] {
-    width: auto;
-    margin: 0;
+.carrito-sabores-lista .eliminar-sabor {
+    background: none;
+    border: none;
+    color: var(--secondary-color);
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-left: 1rem;
+    transition: color 0.2s;
+}
+.carrito-sabores-lista .eliminar-sabor:hover {
+    color: var(--primary-color);
 }
 
 .submit-button {

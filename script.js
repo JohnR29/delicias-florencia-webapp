@@ -43,33 +43,72 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
+
+// Carrito de sabores para cotización
+const carritoSabores = [];
+const saborSelect = document.getElementById('sabor-select');
+const saborCantidad = document.getElementById('sabor-cantidad');
+const agregarSaborBtn = document.getElementById('agregar-sabor');
+const carritoLista = document.getElementById('carrito-sabores-lista');
+const saboresCarritoInput = document.getElementById('sabores-carrito');
+
+function renderCarritoSabores() {
+    carritoLista.innerHTML = '';
+    carritoSabores.forEach((item, idx) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span><strong>${item.saborNombre}</strong> - ${item.cantidad} unidad(es)</span> <button type="button" class="eliminar-sabor" data-idx="${idx}">Eliminar</button>`;
+        carritoLista.appendChild(li);
+    });
+    saboresCarritoInput.value = JSON.stringify(carritoSabores);
+}
+
+agregarSaborBtn.addEventListener('click', () => {
+    const sabor = saborSelect.value;
+    const cantidad = parseInt(saborCantidad.value);
+    if (!sabor || cantidad < 1) return;
+    const saborNombre = saborSelect.options[saborSelect.selectedIndex].text;
+    // Si ya existe, suma cantidad
+    const existente = carritoSabores.find(item => item.sabor === sabor);
+    if (existente) {
+        existente.cantidad += cantidad;
+    } else {
+        carritoSabores.push({ sabor, saborNombre, cantidad });
+    }
+    renderCarritoSabores();
+});
+
+carritoLista.addEventListener('click', (e) => {
+    if (e.target.classList.contains('eliminar-sabor')) {
+        const idx = parseInt(e.target.getAttribute('data-idx'));
+        carritoSabores.splice(idx, 1);
+        renderCarritoSabores();
+    }
+});
+
 // Formulario de cotización
 document.getElementById('cotizacionForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    // Obtener datos del formulario
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
-    
-    // Obtener sabores seleccionados
-    const saboresSeleccionados = [];
-    document.querySelectorAll('input[name="sabores"]:checked').forEach(checkbox => {
-        saboresSeleccionados.push(checkbox.value);
-    });
-    
-    // Validaciones
-    if (!validateForm(data, saboresSeleccionados)) {
-        return;
+    let total = 0;
+    try {
+        const sabores = JSON.parse(data['sabores-carrito'] || '[]');
+        total = sabores.reduce((acc, s) => acc + parseInt(s.cantidad), 0);
+        if (total < 6) {
+            alert('La cantidad mínima es 6 unidades en total.');
+            return;
+        }
+        if (sabores.length === 0) {
+            alert('Agrega al menos un sabor.');
+            return;
+        }
+        // Preparar mailto con los datos del carrito
+        const mailto = buildMailtoPedido(data, sabores);
+        window.location.href = mailto;
+        showSuccessMessage();
+    } catch (err) {
+        alert('Error en la selección de sabores.');
     }
-    
-    // Preparar email
-    const emailData = prepareEmailData(data, saboresSeleccionados);
-    
-    // Enviar email (usando mailto temporal)
-    sendEmail(emailData);
-    
-    // Mostrar mensaje de éxito
-    showSuccessMessage();
 });
 
 function validateForm(data, sabores) {
@@ -98,49 +137,22 @@ function validateForm(data, sabores) {
     return true;
 }
 
-function prepareEmailData(data, sabores) {
-    const cantidad = parseInt(data.cantidad);
-    const precioUnitario = cantidad >= 15 ? 1500 : 1650;
-    const total = cantidad * precioUnitario;
-    
-    const saboresTexto = sabores.map(sabor => {
-        return sabor.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
-    }).join(', ');
-    
-    const subject = `Cotización Tortas en Vaso - ${data.cantidad} unidades`;
-    
-    const body = `
-Hola Delicias Florencia,
 
-Me gustaría solicitar una cotización para tortas en vaso con los siguientes detalles:
-
-INFORMACIÓN DEL PEDIDO:
-• Cantidad: ${data.cantidad} unidades
-• Sabores: ${saboresTexto}
-• Detalle de sabores: ${data['sabores-detalle'] || 'No especificado'}
-• Precio estimado: $${precioUnitario} por unidad (Total aprox: $${total.toLocaleString()})
-
-INFORMACIÓN DE ENTREGA:
-• Fecha deseada: ${data.fecha}
-• Dirección: ${data.direccion}
-
-INFORMACIÓN DE CONTACTO:
-• Teléfono: ${data.telefono}
-
-COMENTARIOS ADICIONALES:
-${data.comentarios || 'Ninguno'}
-
-Quedo atenta a su respuesta.
-
-Saludos cordiales.
-    `.trim();
-    
-    return { subject, body };
-}
-
-function sendEmail(emailData) {
-    const mailtoLink = `mailto:johnrojas297@gmail.com?subject=${encodeURIComponent(emailData.subject)}&body=${encodeURIComponent(emailData.body)}`;
-    window.location.href = mailtoLink;
+function buildMailtoPedido(data, sabores) {
+    const destinatario = 'deliciasflorencia@email.com'; // Cambia por el correo real del negocio
+    let subject = `Nueva cotización de ${data.telefono || 'cliente web'}`;
+    let body = `¡Nuevo pedido de cotización!%0D%0A%0D%0A`;
+    body += `Nombre: ${data.nombre || ''}%0D%0A`;
+    body += `Teléfono: ${data.telefono || ''}%0D%0A`;
+    body += `Fecha deseada: ${data.fecha || ''}%0D%0A`;
+    body += `Dirección: ${data.direccion || ''}%0D%0A`;
+    body += `Comentarios: ${data.comentarios || ''}%0D%0A%0D%0A`;
+    body += `Sabores y cantidades:%0D%0A`;
+    sabores.forEach(s => {
+        body += `- ${s.saborNombre}: ${s.cantidad} unidad(es)%0D%0A`;
+    });
+    body += `%0D%0A¡Revisar y contactar al cliente!`;
+    return `mailto:${destinatario}?subject=${encodeURIComponent(subject)}&body=${body}`;
 }
 
 function showSuccessMessage() {

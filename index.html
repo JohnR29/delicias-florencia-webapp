@@ -225,31 +225,20 @@
 
                 <form class="cotizar-form" id="cotizacionForm">
                     <div class="form-group">
-                        <label for="cantidad">Cantidad de tortas *</label>
-                        <input type="number" id="cantidad" name="cantidad" min="6" required>
-                        <small>Mínimo 6 unidades</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="sabores">Sabores deseados *</label>
-                        <div class="sabores-checkboxes">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="sabores" value="tres-leches">
-                                <span class="checkmark"></span>
-                                Tres Leches
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="sabores" value="selva-negra">
-                                <span class="checkmark"></span>
-                                Selva Negra
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="sabores" value="oreo">
-                                <span class="checkmark"></span>
-                                Oreo
-                            </label>
+                        <label for="sabor-select">Selecciona sabor y cantidad *</label>
+                        <div class="carrito-sabores-row">
+                            <select id="sabor-select">
+                                <option value="tres-leches">Tres Leches</option>
+                                <option value="selva-negra">Selva Negra</option>
+                                <option value="oreo">Oreo</option>
+                                <option value="pina-crema">Piña Crema</option>
+                            </select>
+                            <input type="number" id="sabor-cantidad" min="1" value="1" style="width:80px; margin-left:10px;">
+                            <button type="button" id="agregar-sabor" style="margin-left:10px;">Agregar</button>
                         </div>
-                        <textarea id="sabores-detalle" name="sabores-detalle" placeholder="Especifica las cantidades de cada sabor (ej: 10 Tres Leches, 5 Oreo)"></textarea>
+                        <small>Agrega los sabores y cantidades que desees. Mínimo total: 6 unidades.</small>
+                        <ul id="carrito-sabores-lista" class="carrito-sabores-lista"></ul>
+                        <input type="hidden" id="sabores-carrito" name="sabores-carrito">
                     </div>
 
                     <div class="form-row">
