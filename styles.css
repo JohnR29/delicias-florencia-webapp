@@ -1,0 +1,784 @@
+/* Reset y Variables */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary-color: #E8B4B8;
+    --secondary-color: #7A9A7E;
+    --accent-color: #F4E7E7;
+    --text-dark: #2C2C2C;
+    --text-light: #666;
+    --white: #FFFFFF;
+    --shadow: 0 4px 15px rgba(0,0,0,0.1);
+    --border-radius: 15px;
+    --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header y Navegación */
+.header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    box-shadow: var(--shadow);
+}
+
+.navbar {
+    padding: 1rem 0;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.logo-img {
+    height: 60px;
+    width: auto;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    transition: var(--transition);
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background: var(--primary-color);
+    transition: var(--transition);
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background: var(--text-dark);
+    margin: 3px 0;
+    transition: var(--transition);
+}
+
+/* Hero Section */
+.hero {
+    padding: 120px 0 80px;
+    background: linear-gradient(135deg, var(--accent-color) 0%, #FFF 100%);
+    display: flex;
+    align-items: center;
+    min-height: 80vh;
+}
+
+.hero-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.hero-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 4rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.hero-subtitle {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.hero-description {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+}
+
+.cta-button {
+    display: inline-block;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: var(--white);
+    padding: 15px 30px;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.hero-cake-showcase {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-cake {
+    width: 100%;
+    max-width: 400px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.hero-cake:hover {
+    transform: scale(1.05);
+}
+
+/* Secciones Generales */
+.section-title {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3rem;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 3rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Sabores Section */
+.sabores {
+    padding: 80px 0;
+    background: var(--white);
+}
+
+.sabores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.sabor-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.sabor-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.sabor-image {
+    height: 250px;
+    overflow: hidden;
+}
+
+.sabor-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.sabor-card:hover .sabor-image img {
+    transform: scale(1.1);
+}
+
+.sabor-content {
+    padding: 1.5rem;
+}
+
+.sabor-content h3 {
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.sabor-content p {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.sabores-note {
+    background: linear-gradient(45deg, var(--accent-color), #FFF);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.sabores-note i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+/* Precios Section */
+.precios {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--accent-color) 0%, #FFF 100%);
+}
+
+.precios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.precio-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.precio-card.mayorista {
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.precio-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.precio-card.mayorista:hover {
+    transform: scale(1.05) translateY(-5px);
+}
+
+.precio-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 5px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.precio-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.precio-header h3 {
+    color: var(--text-dark);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.precio {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.currency {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.amount {
+    font-size: 3rem;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.unit {
+    font-size: 1rem;
+    color: var(--text-light);
+}
+
+.cantidad {
+    text-align: center;
+    color: var(--secondary-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.precio-features {
+    list-style: none;
+}
+
+.precio-features li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.precio-features i {
+    color: var(--secondary-color);
+}
+
+.precios-note {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+/* Cobertura Section */
+.cobertura {
+    padding: 80px 0;
+    background: var(--white);
+}
+
+.cobertura-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+    align-items: center;
+    margin-bottom: 3rem;
+}
+
+.cobertura-map {
+    text-align: center;
+}
+
+.cobertura-map i {
+    font-size: 8rem;
+    color: var(--primary-color);
+    opacity: 0.7;
+}
+
+.cobertura-list h3 {
+    color: var(--text-dark);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.comunas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.comuna-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem;
+    background: var(--accent-color);
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.comuna-item:hover {
+    background: var(--primary-color);
+    color: var(--white);
+    transform: translateX(5px);
+}
+
+.comuna-item i {
+    color: var(--secondary-color);
+    font-size: 1.1rem;
+}
+
+.comuna-item:hover i {
+    color: var(--white);
+}
+
+.entrega-info {
+    display: flex;
+    justify-content: center;
+}
+
+.entrega-card {
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: var(--white);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    box-shadow: var(--shadow);
+    max-width: 300px;
+}
+
+.entrega-card i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.entrega-card h4 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+/* Cotización Section */
+.cotizar {
+    padding: 80px 0;
+    background: linear-gradient(135deg, var(--accent-color) 0%, #FFF 100%);
+}
+
+.cotizar-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+}
+
+.info-card {
+    background: var(--white);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.info-card:hover {
+    transform: translateY(-3px);
+}
+
+.info-card i {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.info-card h4 {
+    color: var(--text-dark);
+    font-size: 1.2rem;
+    margin-bottom: 0.8rem;
+    font-weight: 600;
+}
+
+.cotizar-form {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #E5E5E5;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.1);
+}
+
+.form-group small {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    display: block;
+}
+
+.sabores-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.checkbox-label:hover {
+    background: var(--accent-color);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+.submit-button {
+    width: 100%;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: var(--white);
+    padding: 15px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+/* Footer */
+.footer {
+    background: var(--text-dark);
+    color: var(--white);
+    padding: 3rem 0 1rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.footer-logo {
+    height: 80px;
+    margin-bottom: 1rem;
+}
+
+.footer-section h4 {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.footer-section p {
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-section i {
+    color: var(--primary-color);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid #444;
+    color: #AAA;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        left: -100%;
+        top: 80px;
+        flex-direction: column;
+        background-color: var(--white);
+        width: 100%;
+        text-align: center;
+        transition: var(--transition);
+        box-shadow: var(--shadow);
+        padding: 2rem 0;
+    }
+    
+    .nav-menu.active {
+        left: 0;
+    }
+    
+    .hero-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 2rem;
+    }
+    
+    .hero-title {
+        font-size: 3rem;
+    }
+    
+    .section-title {
+        font-size: 2.5rem;
+    }
+    
+    .cotizar-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .cobertura-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .precios-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .precio-card.mayorista {
+        transform: none;
+    }
+    
+    .sabores-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .container {
+        padding: 0 15px;
+    }
+    
+    .cotizar-form {
+        padding: 1.5rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.sabor-card,
+.precio-card,
+.info-card {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Estados de carga */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.success-message {
+    background: var(--secondary-color);
+    color: var(--white);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    margin-top: 1rem;
+    text-align: center;
+}
