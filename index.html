@@ -111,27 +111,46 @@
             <div class="precios-grid">
                 <div class="precio-card">
                     <div class="precio-header">
-                        <h3>Pedido Mínimo</h3>
+                        <h3>Tramo 1</h3>
                         <div class="precio">
                             <span class="currency">$</span>
-                            <span class="amount">1,650</span>
+                            <span class="amount">1,700</span>
                             <span class="unit">c/u</span>
                         </div>
                     </div>
                     <div class="precio-content">
-                        <p class="cantidad">6 unidades mínimo</p>
+                        <p class="cantidad">Desde 6 a 14 unidades</p>
                         <ul class="precio-features">
-                            <li><i class="fas fa-check"></i> Perfectos para eventos pequeños</li>
                             <li><i class="fas fa-check"></i> Puedes combinar sabores</li>
                             <li><i class="fas fa-check"></i> Presentación elegante</li>
+                            <li><i class="fas fa-check"></i> Pedido mínimo 6</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="precio-card mayorista">
-                    <div class="precio-badge">Más Popular</div>
+                    <div class="precio-badge">Popular</div>
                     <div class="precio-header">
-                        <h3>Precio Mayorista</h3>
+                        <h3>Tramo 2</h3>
+                        <div class="precio">
+                            <span class="currency">$</span>
+                            <span class="amount">1,600</span>
+                            <span class="unit">c/u</span>
+                        </div>
+                    </div>
+                    <div class="precio-content">
+                        <p class="cantidad">Desde 15 a 19 unidades</p>
+                        <ul class="precio-features">
+                            <li><i class="fas fa-check"></i> Ahorro frente al tramo 1</li>
+                            <li><i class="fas fa-check"></i> Combina todos los sabores</li>
+                            <li><i class="fas fa-check"></i> Ideal eventos medianos</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="precio-card" style="border-color: var(--secondary-color);">
+                    <div class="precio-header">
+                        <h3>Tramo 3</h3>
                         <div class="precio">
                             <span class="currency">$</span>
                             <span class="amount">1,500</span>
@@ -139,12 +158,11 @@
                         </div>
                     </div>
                     <div class="precio-content">
-                        <p class="cantidad">15 unidades o más</p>
+                        <p class="cantidad">20 unidades o más</p>
                         <ul class="precio-features">
-                            <li><i class="fas fa-check"></i> Ideal para eventos grandes</li>
                             <li><i class="fas fa-check"></i> Mejor precio por unidad</li>
-                            <li><i class="fas fa-check"></i> Combina todos los sabores</li>
-                            <li><i class="fas fa-check"></i> Ahorro significativo</li>
+                            <li><i class="fas fa-check"></i> Perfecto para grandes eventos</li>
+                            <li><i class="fas fa-check"></i> Máximo ahorro</li>
                         </ul>
                     </div>
                 </div>
@@ -204,13 +222,36 @@
     <div class="sabores-cards" id="sabores-pedido" data-dinamico="true"><!-- Tarjetas generadas dinámicamente --></div>
         <div class="resumen-pedido">
             <h3>Resumen</h3>
+            <form id="form-datos-cliente" novalidate style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem;">
+                <div class="resumen-form-group">
+                    <label for="campo-nombre">Nombre <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-nombre" name="nombre" type="text" autocomplete="name" required placeholder="Tu nombre" />
+                </div>
+                <div class="resumen-form-group">
+                    <label for="campo-telefono">Teléfono / WhatsApp <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-telefono" name="telefono" type="tel" inputmode="tel" required placeholder="+56 9 ..." />
+                </div>
+                <div class="resumen-form-group">
+                    <label for="campo-fecha">Fecha deseada (mín. 4 días) <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-fecha" name="fecha" type="date" required />
+                </div>
+                <div class="resumen-form-group">
+                    <label for="campo-direccion">Dirección / Comuna</label>
+                    <input id="campo-direccion" name="direccion" type="text" placeholder="Comuna o dirección" />
+                </div>
+                <div class="resumen-form-group">
+                    <label for="campo-comentarios">Comentarios</label>
+                    <textarea id="campo-comentarios" name="comentarios" rows="2" placeholder="Detalles, horario, etc."></textarea>
+                </div>
+            </form>
             <ul id="resumen-lista"></ul>
             <div class="resumen-totales" aria-live="polite">
-                <span id="resumen-precio-unitario" data-default="$1.650">$1.650</span>
+                <span id="resumen-precio-unitario" data-default="$1.700">$1.700</span>
                 <span>* <span id="resumen-total-cantidad">0</span></span>
                 <span>Total</span>
                 <span id="resumen-total">$0</span>
             </div>
+            <div id="upsell-hint" class="upsell-hint" aria-live="polite"></div>
             <button id="btn-solicitar-pedido" class="submit-button" style="margin-top:1rem;" aria-disabled="true">Solicitar pedido</button>
             <div id="live-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
         </div>

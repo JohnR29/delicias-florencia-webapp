@@ -1,10 +1,13 @@
 // ==========================
 // Constantes de configuración
 // ==========================
-const MINIMO_PEDIDO = 6;
-const UMBRAL_MAYORISTA = 15;
-const PRECIO_NORMAL = 1650;
-const PRECIO_MAYORISTA = 1500;
+const MINIMO_PEDIDO = 6; // Pedido mínimo
+// Nuevos tramos de precios escalonados
+const UMBRAL_TIER2 = 15; // desde 15
+const UMBRAL_TIER3 = 20; // desde 20
+const PRECIO_TIER1 = 1700; // 6 - 14
+const PRECIO_TIER2 = 1600; // 15 - 19
+const PRECIO_TIER3 = 1500; // 20+
 const EMAIL_DESTINO = 'deliciasflorencia@email.com'; // TODO: parametrizar
 
 // ==========================
@@ -12,7 +15,12 @@ const EMAIL_DESTINO = 'deliciasflorencia@email.com'; // TODO: parametrizar
 // ==========================
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-const getPrecioUnitario = total => total >= UMBRAL_MAYORISTA ? PRECIO_MAYORISTA : PRECIO_NORMAL;
+function getPrecioUnitario(total) {
+    if (total >= UMBRAL_TIER3) return PRECIO_TIER3;
+    if (total >= UMBRAL_TIER2) return PRECIO_TIER2;
+    if (total >= MINIMO_PEDIDO) return PRECIO_TIER1;
+    return PRECIO_TIER1; // fallback (no debería cotizar por debajo del mínimo)
+}
 
 // Accesibilidad: actualización discreta de estado
 function announce(msg) {
@@ -26,10 +34,10 @@ function announce(msg) {
 // Datos (centralizado)
 // ==========================
 const saboresData = Object.freeze([
-    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'] },
-    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'] },
-    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'] },
-    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_MAYORISTA, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'] }
+    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'] },
+    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'] },
+    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'] },
+    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'] }
 ]);
 
 const cantidades = Object.fromEntries(saboresData.map(s => [s.key, 0]));
@@ -102,9 +110,26 @@ function actualizarResumen() {
     const resumenPrecioUnitario = $('#resumen-precio-unitario');
     const resumenTotalCantidad = $('#resumen-total-cantidad');
     const resumenTotal = $('#resumen-total');
+    const upsellHint = $('#upsell-hint');
     if (resumenPrecioUnitario) resumenPrecioUnitario.textContent = `$${precioUnitario.toLocaleString('es-CL')}`;
     if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
     if (resumenTotal) resumenTotal.textContent = `$${totalFinal.toLocaleString('es-CL')}`;
+
+    if (upsellHint) {
+        let msg = '';
+        if (totalCantidad >= MINIMO_PEDIDO && totalCantidad < UMBRAL_TIER2) {
+            const faltan = UMBRAL_TIER2 - totalCantidad;
+            msg = `Agrega ${faltan} unidad${faltan===1?'':'es'} más y baja a $${PRECIO_TIER2.toLocaleString('es-CL')} c/u.`;
+        } else if (totalCantidad >= UMBRAL_TIER2 && totalCantidad < UMBRAL_TIER3) {
+            const faltan = UMBRAL_TIER3 - totalCantidad;
+            msg = `Con ${faltan} unidad${faltan===1?'':'es'} más alcanzas $${PRECIO_TIER3.toLocaleString('es-CL')} c/u (mejor precio).`;
+        } else if (totalCantidad >= UMBRAL_TIER3) {
+            msg = `Tienes el mejor precio ($${PRECIO_TIER3.toLocaleString('es-CL')} c/u).`;
+        } else {
+            msg = `Mínimo ${MINIMO_PEDIDO} unidades para cotizar.`;
+        }
+        upsellHint.textContent = msg;
+    }
 
     // Botón
     const btnSolicitar = $('#btn-solicitar-pedido');
@@ -152,7 +177,36 @@ function configurarBotonSolicitar() {
         const totalFinal = totalCantidad * precioUnitario;
         const saboresSeleccionados = saboresData.filter(s => cantidades[s.key] > 0);
         if (!saboresSeleccionados.length) return;
+
+        // Datos cliente
+        const nombre = $('#campo-nombre')?.value.trim();
+        const telefono = $('#campo-telefono')?.value.trim();
+        const fecha = $('#campo-fecha')?.value;
+        const direccion = $('#campo-direccion')?.value.trim();
+        const comentarios = $('#campo-comentarios')?.value.trim();
+
+        // Validación básica
+        if (!nombre || !telefono || !fecha) {
+            alert('Por favor completa Nombre, Teléfono y Fecha.');
+            return;
+        }
+        // Fecha mínima 4 días
+        const hoy = new Date();
+        const fechaMin = new Date();
+        fechaMin.setDate(hoy.getDate() + 4);
+        const fechaUser = new Date(fecha + 'T00:00:00');
+        if (fechaUser < fechaMin) {
+            alert('La fecha debe tener al menos 4 días de anticipación.');
+            return;
+        }
+
         let body = 'Pedido de cotización:%0D%0A%0D%0A';
+        body += `Nombre: ${nombre}%0D%0A`;
+        body += `Teléfono: ${telefono}%0D%0A`;
+        body += `Fecha deseada: ${fecha}%0D%0A`;
+        if (direccion) body += `Dirección: ${direccion}%0D%0A`;
+        if (comentarios) body += `Comentarios: ${comentarios}%0D%0A`;
+        body += `%0D%0A`;
         saboresSeleccionados.forEach(s => {
             body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
         });
@@ -230,6 +284,16 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarScrollSuave();
     configurarAnimaciones();
     actualizarResumen();
+    // establecer fecha mínima
+    const inputFecha = $('#campo-fecha');
+    if (inputFecha) {
+        const base = new Date();
+        base.setDate(base.getDate() + 4);
+        const y = base.getFullYear();
+        const m = String(base.getMonth() + 1).padStart(2, '0');
+        const d = String(base.getDate()).padStart(2, '0');
+        inputFecha.min = `${y}-${m}-${d}`;
+    }
 });
 
 // (Opcional) Parallax deshabilitado para evitar mareo / rendimiento; si se quiere, habilitar con prefers-reduced-motion check.
