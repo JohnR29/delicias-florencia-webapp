@@ -75,45 +75,52 @@ const saboresData = [
 ];
 
 const cantidades = {};
-saboresData.forEach(s => cantidades[s.key] = 0);
+saboresData.forEach(s => {
+    cantidades[s.key] = 0;
+});
 
 function actualizarResumen() {
+    // Actualizar cantidades en las tarjetas
+    document.querySelectorAll('.sabor-card-pedido').forEach(card => {
+        const key = card.getAttribute('data-sabor');
+        const cantidadSpan = card.querySelector('.cantidad');
+        cantidadSpan.textContent = cantidades[key];
+    });
+
+    // Actualizar resumen visual SOLO con sabores con cantidad > 0
     const resumenLista = document.getElementById('resumen-lista');
-    const resumenPrecioUnitario = document.getElementById('resumen-precio-unitario');
-    const resumenTotalCantidad = document.getElementById('resumen-total-cantidad');
-    const resumenTotal = document.getElementById('resumen-total');
     resumenLista.innerHTML = '';
-    let total = 0;
     let totalCantidad = 0;
+    let total = 0;
     saboresData.forEach(sabor => {
         if (cantidades[sabor.key] > 0) {
             const li = document.createElement('li');
-            li.innerHTML = `${sabor.nombre} <span>* ${cantidades[sabor.key]}</span>`;
+            li.innerHTML = `<span>${sabor.nombre}</span> <span>* ${cantidades[sabor.key]}</span>`;
             resumenLista.appendChild(li);
-            total += cantidades[sabor.key] * sabor.precio;
             totalCantidad += cantidades[sabor.key];
+            total += cantidades[sabor.key] * sabor.precio;
         }
     });
-    resumenPrecioUnitario.textContent = `$1.500`;
-    resumenTotalCantidad.textContent = totalCantidad;
-    resumenTotal.textContent = `$${total.toLocaleString()}`;
+    const resumenPrecioUnitario = document.getElementById('resumen-precio-unitario');
+    const resumenTotalCantidad = document.getElementById('resumen-total-cantidad');
+    const resumenTotal = document.getElementById('resumen-total');
+    if (resumenPrecioUnitario) resumenPrecioUnitario.textContent = `$1.500`;
+    if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
+    if (resumenTotal) resumenTotal.textContent = `$${(total).toLocaleString('es-CL')}`;
 }
 
 document.querySelectorAll('.sabor-card-pedido').forEach(card => {
     const key = card.getAttribute('data-sabor');
     const menosBtn = card.querySelector('.menos-btn');
     const masBtn = card.querySelector('.mas-btn');
-    const cantidadSpan = card.querySelector('.cantidad');
     menosBtn.addEventListener('click', () => {
         if (cantidades[key] > 0) {
             cantidades[key]--;
-            cantidadSpan.textContent = cantidades[key];
             actualizarResumen();
         }
     });
     masBtn.addEventListener('click', () => {
         cantidades[key]++;
-        cantidadSpan.textContent = cantidades[key];
         actualizarResumen();
     });
 });
