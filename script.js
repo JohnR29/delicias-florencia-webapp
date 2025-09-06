@@ -84,68 +84,173 @@ function actualizarResumen() {
     document.querySelectorAll('.sabor-card-pedido').forEach(card => {
         const key = card.getAttribute('data-sabor');
         const cantidadSpan = card.querySelector('.cantidad');
-        cantidadSpan.textContent = cantidades[key];
+        if (cantidadSpan) {
+            cantidadSpan.textContent = cantidades[key] || 0;
+        }
     });
 
     // Actualizar resumen visual SOLO con sabores con cantidad > 0
     const resumenLista = document.getElementById('resumen-lista');
-    resumenLista.innerHTML = '';
-    let totalCantidad = 0;
-    let total = 0;
-    saboresData.forEach(sabor => {
-        if (cantidades[sabor.key] > 0) {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${sabor.nombre}</span> <span>* ${cantidades[sabor.key]}</span>`;
-            resumenLista.appendChild(li);
-            totalCantidad += cantidades[sabor.key];
-            total += cantidades[sabor.key] * sabor.precio;
+    if (resumenLista) {
+        resumenLista.innerHTML = '';
+        let totalCantidad = 0;
+        let total = 0;
+        
+        saboresData.forEach(sabor => {
+            if (cantidades[sabor.key] > 0) {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${sabor.nombre}</span> <span>x ${cantidades[sabor.key]}</span>`;
+                resumenLista.appendChild(li);
+                totalCantidad += cantidades[sabor.key];
+                total += cantidades[sabor.key] * sabor.precio;
+            }
+        });
+        
+        // Actualizar totales
+        const resumenPrecioUnitario = document.getElementById('resumen-precio-unitario');
+        const resumenTotalCantidad = document.getElementById('resumen-total-cantidad');
+        const resumenTotal = document.getElementById('resumen-total');
+        
+        if (resumenPrecioUnitario) {
+            const precioUnitario = totalCantidad >= 15 ? 1500 : 1650;
+            resumenPrecioUnitario.textContent = `$${precioUnitario.toLocaleString('es-CL')}`;
         }
-    });
-    const resumenPrecioUnitario = document.getElementById('resumen-precio-unitario');
-    const resumenTotalCantidad = document.getElementById('resumen-total-cantidad');
-    const resumenTotal = document.getElementById('resumen-total');
-    if (resumenPrecioUnitario) resumenPrecioUnitario.textContent = `$1.500`;
-    if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
-    if (resumenTotal) resumenTotal.textContent = `$${(total).toLocaleString('es-CL')}`;
+        if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
+        if (resumenTotal) {
+            const precioUnitario = totalCantidad >= 15 ? 1500 : 1650;
+            const totalFinal = totalCantidad * precioUnitario;
+            resumenTotal.textContent = `$${totalFinal.toLocaleString('es-CL')}`;
+        }
+        
+        // Habilitar/deshabilitar botón de solicitar pedido
+        const btnSolicitar = document.getElementById('btn-solicitar-pedido');
+        if (btnSolicitar) {
+            btnSolicitar.disabled = totalCantidad < 6;
+            if (totalCantidad < 6) {
+                btnSolicitar.textContent = `Mínimo 6 unidades (${totalCantidad}/6)`;
+                btnSolicitar.style.opacity = '0.6';
+            } else {
+                btnSolicitar.textContent = 'Solicitar pedido';
+                btnSolicitar.style.opacity = '1';
+            }
+        }
+    }
 }
 
-document.querySelectorAll('.sabor-card-pedido').forEach(card => {
-    const key = card.getAttribute('data-sabor');
-    const menosBtn = card.querySelector('.menos-btn');
-    const masBtn = card.querySelector('.mas-btn');
-    menosBtn.addEventListener('click', () => {
-        if (cantidades[key] > 0) {
-            cantidades[key]--;
+// Inicializar eventos de botones
+function inicializarBotonesCantidad() {
+    document.querySelectorAll('.sabor-card-pedido').forEach(card => {
+        const key = card.getAttribute('data-sabor');
+        const menosBtn = card.querySelector('.menos-btn');
+        const masBtn = card.querySelector('.mas-btn');
+        
+        // Remover event listeners existentes para evitar duplicados
+        menosBtn.replaceWith(menosBtn.cloneNode(true));
+        masBtn.replaceWith(masBtn.cloneNode(true));
+        
+        // Obtener referencias actualizadas
+        const nuevoMenosBtn = card.querySelector('.menos-btn');
+        const nuevoMasBtn = card.querySelector('.mas-btn');
+        
+        nuevoMenosBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (cantidades[key] > 0) {
+                cantidades[key]--;
+                actualizarResumen();
+            }
+        });
+        
+        nuevoMasBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            cantidades[key]++;
             actualizarResumen();
-        }
+        });
     });
-    masBtn.addEventListener('click', () => {
-        cantidades[key]++;
-        actualizarResumen();
-    });
+}
+
+// Inicializar botones cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarBotonesCantidad();
+    actualizarResumen();
 });
 
-actualizarResumen();
-
-document.getElementById('btn-solicitar-pedido').addEventListener('click', function() {
-    // Construir resumen para mailto
-    const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
-    if (totalCantidad < 6) {
-        alert('La cantidad mínima es 6 unidades en total.');
-        return;
+// Mejorar el event listener del botón solicitar pedido
+document.addEventListener('DOMContentLoaded', function() {
+    const btnSolicitarPedido = document.getElementById('btn-solicitar-pedido');
+    if (btnSolicitarPedido) {
+        btnSolicitarPedido.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Construir resumen para mailto
+            const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
+            
+            if (totalCantidad < 6) {
+                alert('La cantidad mínima es 6 unidades en total.');
+                return;
+            }
+            
+            // Verificar que hay al menos un sabor seleccionado
+            const saboresSeleccionados = saboresData.filter(sabor => cantidades[sabor.key] > 0);
+            if (saboresSeleccionados.length === 0) {
+                alert('Debes seleccionar al menos un sabor.');
+                return;
+            }
+            
+            // Calcular precio unitario basado en cantidad
+            const precioUnitario = totalCantidad >= 15 ? 1500 : 1650;
+            const totalPrecio = totalCantidad * precioUnitario;
+            
+            let body = 'Pedido de cotización:%0D%0A%0D%0A';
+            saboresSeleccionados.forEach(sabor => {
+                body += `- ${sabor.nombre}: ${cantidades[sabor.key]} unidad(es)%0D%0A`;
+            });
+            body += `%0D%0ATotal unidades: ${totalCantidad}%0D%0A`;
+            body += `Precio unitario: $${precioUnitario.toLocaleString('es-CL')}%0D%0A`;
+            body += `Total: $${totalPrecio.toLocaleString('es-CL')}%0D%0A`;
+            body += `%0D%0A¡Revisar y contactar al cliente!`;
+            
+            const subject = `Nueva cotización web (${totalCantidad} unidades)`;
+            const destinatario = 'deliciasflorencia@email.com'; // Cambia por el correo real
+            
+            const mailtoUrl = `mailto:${destinatario}?subject=${encodeURIComponent(subject)}&body=${body}`;
+            window.location.href = mailtoUrl;
+            
+            // Mostrar mensaje de confirmación
+            mostrarMensajeExito();
+        });
     }
-    let body = 'Pedido de cotización:%0D%0A%0D%0A';
-    saboresData.forEach(sabor => {
-        if (cantidades[sabor.key] > 0) {
-            body += `- ${sabor.nombre}: ${cantidades[sabor.key]} unidad(es)%0D%0A`;
-        }
-    });
-    body += `%0D%0ATotal: $${(totalCantidad*1500).toLocaleString()}%0D%0A`;
-    body += `%0D%0A¡Revisar y contactar al cliente!`;
-    const subject = `Nueva cotización web (${totalCantidad} unidades)`;
-    const destinatario = 'deliciasflorencia@email.com'; // Cambia por el correo real
-    window.location.href = `mailto:${destinatario}?subject=${encodeURIComponent(subject)}&body=${body}`;
 });
+
+function mostrarMensajeExito() {
+    // Crear mensaje de éxito temporal
+    const mensaje = document.createElement('div');
+    mensaje.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--secondary-color);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        z-index: 10000;
+        text-align: center;
+        font-weight: 600;
+    `;
+    mensaje.innerHTML = `
+        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+        ¡Solicitud enviada!<br>
+        <small>Se abrirá tu cliente de correo</small>
+    `;
+    
+    document.body.appendChild(mensaje);
+    
+    // Remover mensaje después de 3 segundos
+    setTimeout(() => {
+        mensaje.remove();
+    }, 3000);
+}
 
 // Formulario de cotización
 document.getElementById('cotizacionForm').addEventListener('submit', function(e) {

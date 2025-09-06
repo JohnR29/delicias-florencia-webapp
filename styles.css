@@ -78,6 +78,20 @@
     transition: background 0.2s;
     border-right: 1px solid #bbb;
     border-left: 1px solid #bbb;
+    font-weight: bold;
+    user-select: none;
+}
+.sabor-cantidad-row button:hover {
+    background: var(--primary-color);
+    color: white;
+}
+.sabor-cantidad-row button:active {
+    transform: scale(0.95);
+}
+.sabor-cantidad-row button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f0f0f0;
 }
 .sabor-cantidad-row button:first-child {
     border-left: none;
@@ -138,6 +152,16 @@
     margin-top: 1rem;
     font-weight: bold;
     font-size: 1rem;
+    transition: all 0.3s ease;
+}
+#btn-solicitar-pedido:disabled {
+    background: #ccc !important;
+    cursor: not-allowed;
+    transform: none;
+}
+#btn-solicitar-pedido:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
 }
 /* Reset y Variables */
 * {
