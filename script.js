@@ -295,77 +295,81 @@ function configurarAnimaciones() {
 function configurarMapaCobertura() {
     const mapEl = document.getElementById('coverage-map');
     if (!mapEl || typeof L === 'undefined') return;
+
     mapEl.classList.add('coverage-map-loading');
+
     const centro = [-33.585, -70.67];
-    const map = L.map(mapEl, { scrollWheelZoom:false, attributionControl:true }).setView(centro, 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap' }).addTo(map);
+    const map = L.map(mapEl, {
+        scrollWheelZoom: false,
+        attributionControl: true
+    }).setView(centro, 12);
+
+    // Capa base
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
     fetch('comunas.geojson')
-        .then(r=>r.json())
+        .then(r => r.json())
         .then(data => {
-            // Queremos UNA sola forma visual que represente el área total de cobertura.
-            // Simplificado: FORZAR un solo polígono usando hull sobre todos los vértices.
-            const feats = (data && data.features) ? data.features : [];
-            if (!feats.length) { console.error('GeoJSON vacío'); return; }
-            let unified = null;
-            if (window.turf) {
-                try {
-                    const puntos = [];
-                    feats.forEach(f=>{
-                        const g = f.geometry; if (!g) return;
-                        if (g.type === 'Polygon') g.coordinates[0].forEach(c=>puntos.push(turf.point(c)));
-                        else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly=> poly[0].forEach(c=>puntos.push(turf.point(c))));
-                    });
-                    const ptsFc = turf.featureCollection(puntos);
-                    // Primero concave para forma ajustada
-                    let hull = null;
-                    try { hull = turf.concave(ptsFc, { maxEdge: 8, units:'kilometers' }); } catch { hull = null; }
-                    if (!hull) { try { hull = turf.convex(ptsFc); } catch { hull = null; } }
-                    unified = hull;
-                } catch(err) {
-                    console.warn('Hull falló, usando MultiPolygon', err);
-                }
-                try { if (unified) unified = turf.simplify(unified, { tolerance:0.0005, highQuality:false }); } catch { }
-            }
-            if (!unified) {
-                // Fallback si turf no existe o hull falló
-                unified = { type:'Feature', properties:{}, geometry:{ type:'MultiPolygon', coordinates: feats.map(f=>f.geometry.coordinates) } };
-            }
-            // Si sigue siendo MultiPolygon, convertimos a un polígono grande tomando la envolvente convexa manual
-            if (unified.geometry.type !== 'Polygon' && window.turf) {
-                try {
-                    const allPts = [];
-                    feats.forEach(f=>{
-                        const g=f.geometry; if(!g) return;
-                        if (g.type==='Polygon') g.coordinates[0].forEach(c=>allPts.push(turf.point(c)));
-                        else if (g.type==='MultiPolygon') g.coordinates.forEach(poly=> poly[0].forEach(c=>allPts.push(turf.point(c))));
-                    });
-                    const hull2 = turf.convex(turf.featureCollection(allPts));
-                    if (hull2) unified = hull2;
-                } catch {}
-            }
-            if (unified.geometry.type !== 'Polygon') {
-                console.warn('No se logró un polígono único; Leaflet mostrará múltiples.');
+            const featuresPermitidas = data.features.filter(f =>
+                COMUNAS_PERMITIDAS.includes(f.properties.NOMBRE)
+            );
+
+            // 🔸 1) Crear polígono unificado
+            let union = null;
+            featuresPermitidas.forEach(f => {
+                union = union ? turf.union(union, f) : f;
+            });
+
+            if (union) {
+                L.geoJSON(union, {
+                    style: {
+                        color: '#ff6600',
+                        weight: 2,
+                        fillColor: '#ffcc99',
+                        fillOpacity: 0.15
+                    }
+                }).addTo(map);
             }
 
-            const styleUnified = () => ({
-                weight: 3,
-                color: '#5E31B9',
-                fillColor: '#bfa2ff',
-                fillOpacity: 0.5,
-                interactive: true
-            });
-            const layer = L.geoJSON(unified, { style: styleUnified, onEachFeature: (f,l)=>{
-                l.bindPopup('<strong>Zona de Cobertura</strong><br/>San Bernardo, La Pintana, El Bosque y La Cisterna');
-            }}).addTo(map);
-            try { map.fitBounds(layer.getBounds(), { padding:[25,25] }); } catch(_){ }
-            Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
-                L.marker([lat,lng], { title:nombre }).addTo(map).bindTooltip(nombre, {direction:'top', offset:[0,-6]});
+            // 🔸 2) Dibujar polígonos individuales de cada comuna
+            const capaComunas = L.geoJSON(featuresPermitidas, {
+                style: (feature) => ({
+                    color: '#0077cc',
+                    weight: 1.5,
+                    fillColor: '#66b3ff',
+                    fillOpacity: 0.35
+                }),
+                onEachFeature: (feature, layer) => {
+                    layer.bindTooltip(feature.properties.NOMBRE, {
+                        permanent: false,
+                        direction: 'center'
+                    });
+                }
+            }).addTo(map);
+
+            // Ajustar mapa al área total
+            if (union) {
+                map.fitBounds(L.geoJSON(union).getBounds());
+            } else {
+                map.fitBounds(capaComunas.getBounds());
+            }
+
+            // 🔸 3) Marcadores en el centro de cada comuna
+            Object.entries(COMUNAS_COORDS).forEach(([nombre, { lat, lng }]) => {
+                if (COMUNAS_PERMITIDAS.includes(nombre)) {
+                    L.marker([lat, lng], { title: nombre })
+                        .addTo(map)
+                        .bindTooltip(nombre, { direction: 'top', offset: [0, -6] });
+                }
             });
         })
-        .catch(err => console.error('Error mapa cobertura', err))
-        .finally(()=>{
+        .finally(() => {
             mapEl.classList.remove('coverage-map-loading');
-            const fb = mapEl.querySelector('.coverage-map-fallback'); if (fb) fb.remove();
+            const fb = mapEl.querySelector('.coverage-map-fallback');
+            if (fb) fb.remove();
         });
 }
 
