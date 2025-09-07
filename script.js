@@ -345,10 +345,29 @@ function configurarMapaCobertura() {
             if (window.turf && unified.geometry && unified.geometry.type === 'MultiPolygon') {
                 try {
                     const fc = turf.featureCollection(feats);
-                    const hull = turf.convex(fc);
+                    // Intentamos primero una CONCAVE hull para mantener forma más realista que convex.
+                    // Recolectamos todos los vértices de los polígonos para puntos.
+                    const puntos = [];
+                    feats.forEach(f=>{
+                        const geom = f.geometry;
+                        if (!geom) return;
+                        if (geom.type === 'Polygon') {
+                            geom.coordinates[0].forEach(coord=>puntos.push(turf.point(coord)));
+                        } else if (geom.type === 'MultiPolygon') {
+                            geom.coordinates.forEach(poly=> poly[0].forEach(coord=>puntos.push(turf.point(coord))));
+                        }
+                    });
+                    let hull = null;
+                    if (puntos.length) {
+                        const ptsFc = turf.featureCollection(puntos);
+                        try { hull = turf.concave(ptsFc, { maxEdge: 5, units: 'kilometers' }); } catch(_){ hull = null; }
+                        if (!hull) {
+                            // Fallback a convex si concave no produce resultado
+                            try { hull = turf.convex(ptsFc); } catch(_){ hull = null; }
+                        }
+                    }
                     if (hull && hull.geometry) {
-                        // Usamos hull solo si reduce número de polígonos (representación externa) sin fallar.
-                        unified = hull; // Comentado si se prefiere mantener multipolygon exacto.
+                        unified = hull;
                     }
                 } catch(err) {
                     // Silencioso: mantenemos multipolygon
