@@ -44,7 +44,7 @@ Región Metropolitana:
 
 1. Clonar repositorio.
 2. Colocar recursos de imágenes en la raíz:
-   - `logo-delicias-florencia.png`
+   - `logo-delicias-florencia.jpg`
    - `torta1.jpg` (hero) + imágenes por sabor (`tres-leches.jpg`, `selva-negra.jpg`, `oreo.jpg`, `pina-crema.jpg`).
 3. Abrir `index.html` en navegador (no requiere servidor).
 
