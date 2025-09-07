@@ -9,13 +9,13 @@ const PRECIO_TIER1 = 1700; // 6 - 14
 const PRECIO_TIER2 = 1600; // 15 - 19
 const PRECIO_TIER3 = 1500; // 20+
 const EMAIL_DESTINO = 'johnrojas297@gmail.com'; // TODO: parametrizar
-const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna']);
+const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna', 'Zona de cobertura']);
 // Coordenadas aproximadas de comunas (centroides simplificados)
 const COMUNAS_COORDS = Object.freeze({
-    'San Bernardo': { lat: -33.6006, lng: -70.708 },
-    'La Pintana': { lat: -33.581, lng: -70.6311 },
-    'El Bosque': { lat: -33.5664, lng: -70.6738 },
-    'La Cisterna': { lat: -33.5326, lng: -70.6616 }
+    'San Bernardo': { lat: -33.606246, lng: -70.700462 },
+    'La Pintana': { lat: -33.579463, lng: -70.648956 },
+    'El Bosque': { lat: -33.559729, lng: -70.672550 },
+    'La Cisterna': { lat: -33.528348, lng: -70.668608 }
 });
 
 // ==========================
