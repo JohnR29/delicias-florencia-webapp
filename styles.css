@@ -854,8 +854,8 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
 
 /* Footer */
 .footer {
-    background: var(--text-dark);
-    color: var(--white);
+    background: #f5dfe0e5;
+    color: var(--text-dark);
     padding: 3rem 0 1rem;
 }
 
@@ -897,8 +897,8 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
-    border-top: 1px solid #444;
-    color: #AAA;
+    border-top: 1px solid rgba(44, 44, 44, 0.2);
+    color: var(--text-light);
 }
 
 /* Responsive Design */
