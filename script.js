@@ -278,7 +278,7 @@ function configurarScrollSuave() {
 
 // Animaciones al hacer scroll
 function configurarAnimaciones() {
-    const elements = $$('.sabor-card, .info-card, .precio-mejor');
+    const elements = $$('.sabor-card, .info-card, .precio-tramo');
     if (!('IntersectionObserver' in window)) return; // fallback silencioso
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
@@ -373,6 +373,7 @@ function configurarMapaCobertura() {
 function renderPreciosTramos() {
     const cont = document.getElementById('precios-cards');
     if (!cont) return;
+    try { cont.setAttribute('data-status','generating'); } catch {}
     const tramos = [
         {
             titulo:'Tramo 1',
@@ -412,6 +413,11 @@ function renderPreciosTramos() {
             <button class="pt-cta" data-ir-cotizar="true" aria-label="Usar ${t.titulo} para cotizar">Cotizar</button>
         </article>`;
     }).join('');
+    try { cont.setAttribute('data-status','ready'); } catch {}
+    if (!cont.innerHTML.trim()) {
+        // Fallback estático (no debería ocurrir)
+        cont.innerHTML = '<div style="text-align:center;font-size:.8rem;color:#a33;">No se pudieron cargar los precios. Intenta recargar.</div>';
+    }
 
     cont.addEventListener('click', (e)=>{
         const btn = e.target.closest('button[data-ir-cotizar]');
@@ -434,6 +440,14 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarAnimaciones();
     configurarMapaCobertura();
     renderPreciosTramos();
+    // Verificación tardía por si otro script limpió el contenido
+    setTimeout(() => {
+        const cont = document.getElementById('precios-cards');
+        if (cont && cont.children.length === 0) {
+            console.warn('Reintentando renderPreciosTramos (contenedor vacío tras carga)');
+            renderPreciosTramos();
+        }
+    }, 300);
     actualizarResumen();
     // establecer fecha mínima
     const inputFecha = $('#campo-fecha');
