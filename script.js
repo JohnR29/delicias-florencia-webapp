@@ -312,44 +312,32 @@ function configurarMapaCobertura() {
     fetch('comunas.geojson')
         .then(r=>r.json())
         .then(data => {
-            // Sin bordes internos: stroke desactivado
-            function style(){ return { weight:0, fillColor:'#E8B4B8', fillOpacity:.28, interactive:true }; }
-            function highlight(e){ e.target.setStyle({ fillOpacity:.42 }); }
-            function reset(e){ e.target.setStyle({ fillOpacity:.28 }); }
+            // Polígonos individuales transparentes (solo para popups / precisión)
+            function style(){ return { weight:0, fillColor:'#E8B4B8', fillOpacity:0, interactive:true }; }
+            function highlight(e){ e.target.setStyle({ fillOpacity:.15 }); }
+            function reset(e){ e.target.setStyle({ fillOpacity:0 }); }
             function onEach(f,l){ const nombre=f.properties?.NOMBRE||'Comuna'; l.bindPopup(`<strong>${nombre}</strong><br/>Cobertura disponible`); l.on({mouseover:highlight,mouseout:reset}); }
-            const geo = L.geoJSON(data, { style, onEachFeature:onEach }).addTo(map);
-            try { map.fitBounds(geo.getBounds(), { padding:[25,25] }); } catch(_){ }
+            const geo = L.geoJSON(data, { style, onEachFeature:onEach });
+            const union = (() => {
+                if (!window.turf) return null;
+                let acc = null;
+                geo.eachLayer(l => {
+                    const f = l.feature;
+                    if (!f) return;
+                    acc = acc ? turf.union(acc, f) : f;
+                });
+                return acc;
+            })();
+            if (union) {
+                const unionLayer = L.geoJSON(union, { style: () => ({ weight:3, color:'#8A5FD1', fillColor:'#bfa2ff', fillOpacity:.5 }) }).addTo(map);
+                try { map.fitBounds(unionLayer.getBounds(), { padding:[25,25] }); } catch(_){ }
+            } else {
+                geo.addTo(map);
+                try { map.fitBounds(geo.getBounds(), { padding:[25,25] }); } catch(_){ }
+            }
             Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
                 L.marker([lat,lng], { title:nombre }).addTo(map).bindTooltip(nombre, {direction:'top', offset:[0,-6]});
             });
-            // Construir contorno externo (convex hull) para mostrar un solo borde
-            const allPoints = [];
-            geo.eachLayer(layer => {
-                const g = layer.feature && layer.feature.geometry;
-                if (!g) return;
-                if (g.type === 'Polygon') {
-                    g.coordinates[0].forEach(([lng,lat]) => allPoints.push([lng,lat]));
-                } else if (g.type === 'MultiPolygon') {
-                    g.coordinates.forEach(poly => poly[0].forEach(([lng,lat]) => allPoints.push([lng,lat])));
-                }
-            });
-            function convexHull(pts){
-                if (pts.length < 4) return pts.slice();
-                // ordenar por x luego y
-                const p = pts.slice().sort((a,b)=> a[0]===b[0]? a[1]-b[1] : a[0]-b[0]);
-                const cross = (o,a,b)=> (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0]);
-                const lower=[]; for (const pt of p){ while (lower.length>=2 && cross(lower[lower.length-2], lower[lower.length-1], pt) <=0) lower.pop(); lower.push(pt);} 
-                const upper=[]; for (let i=p.length-1;i>=0;i--){ const pt=p[i]; while (upper.length>=2 && cross(upper[upper.length-2], upper[upper.length-1], pt) <=0) upper.pop(); upper.push(pt);} 
-                upper.pop(); lower.pop(); return lower.concat(upper);
-            }
-            const hull = convexHull(allPoints);
-            if (hull.length) {
-                const hullLatLng = hull.map(([lng,lat])=>[lat,lng]);
-                // Capa de color morado claro (fondo unificado)
-                L.polygon(hullLatLng, { stroke:false, fillColor:'#c9b3ff', fillOpacity:0.20, interactive:false }).addTo(map).bringToBack();
-                // Contorno externo existente
-                L.polygon(hullLatLng, { color:'#7A9A7E', weight:2, fill:false, dashArray:'6 4', interactive:false }).addTo(map);
-            }
         })
         .catch(err => console.error('Error mapa cobertura', err))
         .finally(()=>{
