@@ -313,66 +313,80 @@ function configurarMapaCobertura() {
         .then(r=>r.json())
         .then(data => {
             // Queremos UNA sola forma visual que represente el área total de cobertura.
-            // Paso 1: intentamos unión real con turf.union acumulativa.
-            let unified = null;
+            // Estrategia: forzar un polígono continuo aun si los polígonos base tienen pequeños huecos.
+            // Pasos:
+            // 1. Unión directa.
+            // 2. Si continúa disjunto -> aplicar buffer pequeño (+dist) para "soldar" espacios y volver a unir.
+            // 3. Reducir con buffer negativo (-dist) para aproximar borde original (si es posible).
+            // 4. Si sigue multipart -> generar concave hull (o convex) sobre todos los vértices.
+
             const feats = (data && data.features) ? data.features : [];
-            if (window.turf && feats.length) {
+            if (!feats.length) { console.error('GeoJSON vacío'); return; }
+
+            const BUFFER_DIST_KM = 0.35; // 350m aprox para cerrar huecos simplificados
+            let unified = null;
+
+            if (window.turf) {
+                // Unión directa inicial
                 try {
-                    unified = feats.reduce((acc,f)=>{
-                        if (!acc) return f; // primer feature
-                        try { return turf.union(acc,f); } catch { return acc; }
-                    }, null);
-                } catch(err) {
-                    console.warn('Error uniendo con turf.union', err);
-                    unified = null;
-                }
-            }
-            // Paso 2: si la unión falló o quedó en null, generamos un MultiPolygon directo.
-            if (!unified && feats.length) {
-                const multi = {
-                    type:'Feature',
-                    properties:{ NOMBRE:'Cobertura' },
-                    geometry:{ type:'MultiPolygon', coordinates: feats.map(f=>f.geometry.coordinates) }
-                };
-                unified = multi;
-            }
-            // Paso 3: si aún sin unified, abortamos.
-            if (!unified) {
-                console.error('No se pudo construir polígono de cobertura');
-                return;
-            }
-            // Opcional: si la unión resultó en múltiple geometría y queremos contorno único, intentar hull.
-            if (window.turf && unified.geometry && unified.geometry.type === 'MultiPolygon') {
-                try {
-                    const fc = turf.featureCollection(feats);
-                    // Intentamos primero una CONCAVE hull para mantener forma más realista que convex.
-                    // Recolectamos todos los vértices de los polígonos para puntos.
-                    const puntos = [];
-                    feats.forEach(f=>{
-                        const geom = f.geometry;
-                        if (!geom) return;
-                        if (geom.type === 'Polygon') {
-                            geom.coordinates[0].forEach(coord=>puntos.push(turf.point(coord)));
-                        } else if (geom.type === 'MultiPolygon') {
-                            geom.coordinates.forEach(poly=> poly[0].forEach(coord=>puntos.push(turf.point(coord))));
-                        }
-                    });
-                    let hull = null;
-                    if (puntos.length) {
-                        const ptsFc = turf.featureCollection(puntos);
-                        try { hull = turf.concave(ptsFc, { maxEdge: 5, units: 'kilometers' }); } catch(_){ hull = null; }
-                        if (!hull) {
-                            // Fallback a convex si concave no produce resultado
-                            try { hull = turf.convex(ptsFc); } catch(_){ hull = null; }
-                        }
+                    unified = feats.reduce((acc,f)=> acc ? ( ()=>{ try { return turf.union(acc,f); } catch { return acc; } } )() : f, null);
+                } catch(err) { unified = null; }
+
+                const isMulti = g => g && g.geometry && /Multi/i.test(g.geometry.type);
+
+                if (!unified || isMulti(unified)) {
+                    // Buffer positivo para fusionar
+                    try {
+                        const buffered = feats.map(f=>{
+                            try { return turf.buffer(f, BUFFER_DIST_KM, { units:'kilometers' }); } catch { return f; }
+                        });
+                        const buffUnion = buffered.reduce((acc,f)=> acc ? ( ()=>{ try { return turf.union(acc,f); } catch { return acc; } } )() : f, null);
+                        if (buffUnion) unified = buffUnion;
+                        // Intento de revertir expansión con buffer negativo (mismo valor)
+                        try {
+                            const contracted = turf.buffer(unified, -BUFFER_DIST_KM * 0.9, { units:'kilometers' });
+                            if (contracted && contracted.geometry) unified = contracted;
+                        } catch { /* mantenemos versión expandida */ }
+                    } catch(err) {
+                        console.warn('Fallo buffer union', err);
                     }
-                    if (hull && hull.geometry) {
-                        unified = hull;
-                    }
-                } catch(err) {
-                    // Silencioso: mantenemos multipolygon
                 }
+
+                if (!unified) {
+                    // Fallback: MultiPolygon manual
+                    unified = { type:'Feature', properties:{ NOMBRE:'Cobertura' }, geometry:{ type:'MultiPolygon', coordinates: feats.map(f=>f.geometry.coordinates) } };
+                }
+
+                if (isMulti(unified)) {
+                    // Construimos puntos para hull
+                    try {
+                        const puntos = [];
+                        feats.forEach(f=>{
+                            const geom = f.geometry; if (!geom) return;
+                            if (geom.type === 'Polygon') {
+                                geom.coordinates[0].forEach(c=>puntos.push(turf.point(c)));
+                            } else if (geom.type === 'MultiPolygon') {
+                                geom.coordinates.forEach(poly=> poly[0].forEach(c=>puntos.push(turf.point(c))));
+                            }
+                        });
+                        if (puntos.length) {
+                            const ptsFc = turf.featureCollection(puntos);
+                            let hull = null;
+                            try { hull = turf.concave(ptsFc, { maxEdge: 8, units:'kilometers' }); } catch { hull = null; }
+                            if (!hull) { try { hull = turf.convex(ptsFc); } catch { hull = null; } }
+                            if (hull) unified = hull;
+                        }
+                    } catch(err) { /* silencioso */ }
+                }
+
+                // Simplificación ligera para suavizar borde (tolerance en grados ~ aprox metros variable)
+                try { unified = turf.simplify(unified, { tolerance: 0.0005, highQuality:false }); } catch { /* ignorar */ }
+            } else {
+                // Sin turf: combinamos raw como MultiPolygon (no ideal, pero fallback)
+                unified = { type:'Feature', properties:{ NOMBRE:'Cobertura' }, geometry:{ type:'MultiPolygon', coordinates: feats.map(f=>f.geometry.coordinates) } };
             }
+
+            if (!unified) { console.error('No se pudo generar polígono unificado'); return; }
 
             const styleUnified = () => ({
                 weight: 3,
