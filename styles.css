@@ -523,116 +523,51 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     background: linear-gradient(135deg, var(--accent-color) 0%, #FFF 100%);
 }
 
-.precios-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
+/* Nueva versión simplificada de precios */
+.precios-simple {
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
 }
-
-.precio-card {
+.precio-mejor {
     background: var(--white);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
+    border: 3px solid var(--secondary-color);
+    border-radius: 22px;
+    padding: 1.8rem 1.5rem 2rem;
     position: relative;
-    border: 2px solid transparent;
+    box-shadow: 0 6px 25px -8px rgba(0,0,0,.15);
 }
-
-.precio-card.mayorista {
-    border-color: var(--primary-color);
-    transform: scale(1.05);
-}
-
-.precio-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-}
-
-.precio-card.mayorista:hover {
-    transform: scale(1.05) translateY(-5px);
-}
-
-.precio-badge {
+.pm-etiqueta {
     position: absolute;
-    top: -10px;
+    top: -12px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--primary-color);
-    color: var(--white);
-    padding: 5px 20px;
-    border-radius: 20px;
-    font-size: 0.9rem;
+    background: var(--secondary-color);
+    color: #fff;
+    padding: .35rem 1.2rem .4rem;
+    font-size: .7rem;
     font-weight: 600;
+    letter-spacing: .5px;
+    border-radius: 40px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px -2px rgba(0,0,0,.25);
 }
+.pm-valor { display:flex; align-items:baseline; justify-content:center; gap:.6rem; margin-bottom:.4rem; }
+.pm-monto { font-size: clamp(2.4rem,6vw,3.2rem); font-weight:700; font-family: 'Poppins',sans-serif; color: var(--secondary-color); line-height:1; }
+.pm-unidad { font-size:.9rem; font-weight:600; color: var(--text-light); letter-spacing:.5px; text-transform:uppercase; }
+.pm-detalle { font-size:.85rem; color: var(--text-light); letter-spacing:.3px; }
+.pm-cta { display:inline-block; margin-top:1rem; background: linear-gradient(45deg,var(--secondary-color), var(--primary-color)); color:#fff; text-decoration:none; padding:.7rem 1.4rem; border-radius:40px; font-size:.8rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; transition:.25s; }
+.pm-cta:hover { transform:translateY(-2px); box-shadow:0 6px 18px -4px rgba(0,0,0,.25); }
+.linea-tramos { font-size:.8rem; color: var(--text-dark); background: #ffffffb8; padding:.65rem .9rem; border:1px solid #e7dede; border-radius: 50px; letter-spacing:.5px; }
+.linea-tramos strong { color: var(--text-dark); font-weight:600; }
+.nota-minimo { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color: var(--text-light); font-weight:600; }
 
-.precio-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.precio-header h3 {
-    color: var(--text-dark);
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.precio {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.2rem;
-    margin-bottom: 0.5rem;
-}
-
-.currency {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-    font-weight: 600;
-}
-
-.amount {
-    font-size: 3rem;
-    color: var(--primary-color);
-    font-weight: 700;
-}
-
-.unit {
-    font-size: 1rem;
-    color: var(--text-light);
-}
-
-.cantidad {
-    text-align: center;
-    color: var(--secondary-color);
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-bottom: 1.5rem;
-}
-
-.precio-features {
-    list-style: none;
-}
-
-.precio-features li {
-    padding: 0.5rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.precio-features i {
-    color: var(--secondary-color);
-}
-
-.precios-note {
-    background: var(--white);
-    padding: 1.5rem;
-    border-radius: var(--border-radius);
-    text-align: center;
-    box-shadow: var(--shadow);
+@media (max-width:600px) {
+    .pm-monto { font-size: clamp(2rem,10vw,2.6rem); }
+    .linea-tramos { font-size:.72rem; }
 }
 
 /* Cobertura Section */

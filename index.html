@@ -108,70 +108,20 @@
     <section id="precios" class="precios">
         <div class="container">
             <h2 class="section-title">Precios</h2>
-            <p class="section-subtitle">Precios especiales por cantidad - Puedes combinar sabores</p>
-            
-            <div class="precios-grid">
-                <div class="precio-card">
-                    <div class="precio-header">
-                        <h3>Tramo 1</h3>
-                        <div class="precio">
-                            <span class="currency">$</span>
-                            <span class="amount">1,700</span>
-                            <span class="unit">c/u</span>
-                        </div>
+            <div class="precios-simple" aria-label="Resumen de precios por tramo">
+                <div class="precio-mejor" role="group" aria-label="Mejor precio disponible">
+                    <span class="pm-etiqueta">Mejor precio</span>
+                    <div class="pm-valor" id="pm-valor" aria-live="polite" aria-label="Precio mejor tramo">
+                        <span class="pm-monto" id="pm-mejor-monto">$1.500</span>
+                        <span class="pm-unidad">c/u</span>
                     </div>
-                    <div class="precio-content">
-                        <p class="cantidad">Desde 6 a 14 unidades</p>
-                        <ul class="precio-features">
-                            <li><i class="fas fa-check"></i> Puedes combinar sabores</li>
-                            <li><i class="fas fa-check"></i> Presentación elegante</li>
-                            <li><i class="fas fa-check"></i> Pedido mínimo 6</li>
-                        </ul>
-                    </div>
+                    <p class="pm-detalle" id="pm-detalle-text">Desde 20 unidades · Combina sabores</p>
+                    <a href="#cotizar" class="pm-cta" aria-label="Ir a cotizar con mejor precio">Cotizar</a>
                 </div>
-
-                <div class="precio-card mayorista">
-                    <div class="precio-badge">Popular</div>
-                    <div class="precio-header">
-                        <h3>Tramo 2</h3>
-                        <div class="precio">
-                            <span class="currency">$</span>
-                            <span class="amount">1,600</span>
-                            <span class="unit">c/u</span>
-                        </div>
-                    </div>
-                    <div class="precio-content">
-                        <p class="cantidad">Desde 15 a 19 unidades</p>
-                        <ul class="precio-features">
-                            <li><i class="fas fa-check"></i> Ahorro frente al tramo 1</li>
-                            <li><i class="fas fa-check"></i> Combina todos los sabores</li>
-                            <li><i class="fas fa-check"></i> Ideal eventos medianos</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="precio-card" style="border-color: var(--secondary-color);">
-                    <div class="precio-header">
-                        <h3>Tramo 3</h3>
-                        <div class="precio">
-                            <span class="currency">$</span>
-                            <span class="amount">1,500</span>
-                            <span class="unit">c/u</span>
-                        </div>
-                    </div>
-                    <div class="precio-content">
-                        <p class="cantidad">20 unidades o más</p>
-                        <ul class="precio-features">
-                            <li><i class="fas fa-check"></i> Mejor precio por unidad</li>
-                            <li><i class="fas fa-check"></i> Perfecto para grandes eventos</li>
-                            <li><i class="fas fa-check"></i> Máximo ahorro</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="precios-note">
-                <p><strong>Nota:</strong> Puedes combinar diferentes sabores para alcanzar el precio mayorista</p>
+                <p class="linea-tramos" id="linea-tramos" aria-label="Otros tramos">
+                    6-14: <strong>$1.700</strong> · 15-19: <strong>$1.600</strong> · 20+: <strong>$1.500</strong>
+                </p>
+                <p class="nota-minimo" id="nota-minimo">Pedido mínimo 6 unidades.</p>
             </div>
         </div>
     </section>

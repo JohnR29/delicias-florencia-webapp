@@ -278,7 +278,7 @@ function configurarScrollSuave() {
 
 // Animaciones al hacer scroll
 function configurarAnimaciones() {
-    const elements = $$('.sabor-card, .precio-card, .info-card');
+    const elements = $$('.sabor-card, .info-card, .precio-mejor');
     if (!('IntersectionObserver' in window)) return; // fallback silencioso
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
@@ -369,6 +369,23 @@ function configurarMapaCobertura() {
         });
 }
 
+// Precios simplificados dinámicos (evitar duplicar números en HTML)
+function configurarPreciosSimplificados() {
+    const mejorMontoEl = $('#pm-mejor-monto');
+    const detalleEl = $('#pm-detalle-text');
+    const lineaTramosEl = $('#linea-tramos');
+    const notaMinimoEl = $('#nota-minimo');
+    if (!mejorMontoEl || !detalleEl || !lineaTramosEl || !notaMinimoEl) return;
+    // Mejor tramo siempre el de menor precio (tier 3)
+    mejorMontoEl.textContent = `$${PRECIO_TIER3.toLocaleString('es-CL')}`;
+    detalleEl.textContent = `Desde ${UMBRAL_TIER3}+ unidades · Combina sabores`;
+    lineaTramosEl.innerHTML = `
+        ${MINIMO_PEDIDO}-${UMBRAL_TIER2 - 1}: <strong>$${PRECIO_TIER1.toLocaleString('es-CL')}</strong>
+        · ${UMBRAL_TIER2}-${UMBRAL_TIER3 - 1}: <strong>$${PRECIO_TIER2.toLocaleString('es-CL')}</strong>
+        · ${UMBRAL_TIER3}+: <strong>$${PRECIO_TIER3.toLocaleString('es-CL')}</strong>`;
+    notaMinimoEl.textContent = `Pedido mínimo ${MINIMO_PEDIDO} unidades.`;
+}
+
 
 // Inicialización principal
 document.addEventListener('DOMContentLoaded', () => {
@@ -379,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarScrollSuave();
     configurarAnimaciones();
     configurarMapaCobertura();
+    configurarPreciosSimplificados();
     actualizarResumen();
     // establecer fecha mínima
     const inputFecha = $('#campo-fecha');
