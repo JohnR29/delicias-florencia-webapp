@@ -301,62 +301,6 @@ function configurarAnimaciones() {
     elements.forEach(el => observer.observe(el));
 }
 
-// Mapa de cobertura con Leaflet
-function configurarMapaCobertura() {
-    const mapEl = document.getElementById('coverage-map');
-    if (!mapEl || typeof L === 'undefined') return; // Leaflet no cargó
-    mapEl.classList.add('coverage-map-loading');
-    // Centro promedio simple
-    const centro = [-33.575, -70.665];
-    const map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true }).setView(centro, 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
-    // URL de GeoJSON comunas RM (ejemplo: repositorio público). Si deseas hostear local, coloca archivo comunas.geojson en raíz y cambia la ruta.
-    const GEOJSON_URL = 'comunas.geojson'; // Archivo local servido por GitHub Pages
-    fetch(GEOJSON_URL)
-        .then(r => r.json())
-        .then(data => {
-            // Algunos datasets usan propiedades: NOMBRE, comuna, name, etc.
-            const targetNames = new Set(COMUNAS_PERMITIDAS.map(n => n.toLowerCase()));
-            const filtered = {
-                type: 'FeatureCollection',
-                features: data.features.filter(f => {
-                    const props = f.properties || {};
-                    const nombre = (props.NOMBRE || props.nombre || props.name || '').toLowerCase();
-                    return targetNames.has(nombre);
-                })
-            };
-            function style() { return { color:'#E8B4B8', weight:2, fillColor:'#E8B4B8', fillOpacity:.3 }; }
-            function highlight(e){ e.target.setStyle({ weight:3, fillOpacity:.45 }); }
-            function reset(e){ geojson.resetStyle(e.target); }
-            function onEach(feature, layer){
-                const props = feature.properties || {};
-                const nombre = props.NOMBRE || props.nombre || props.name || 'Comuna';
-                layer.bindPopup(`<strong>${nombre}</strong><br/>Cobertura disponible`);
-                layer.on({ mouseover: highlight, mouseout: reset });
-            }
-            const geojson = L.geoJSON(filtered, { style, onEachFeature: onEach }).addTo(map);
-            try { map.fitBounds(geojson.getBounds(), { padding:[25,25] }); } catch(_) {}
-            // Marcadores opcionales
-            Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
-                L.marker([lat,lng], { title:nombre }).addTo(map).bindTooltip(nombre, {direction:'top', offset:[0,-6]});
-            });
-        })
-        .catch(err => {
-            console.error('Error cargando GeoJSON comunas', err);
-            const msg = document.createElement('div');
-            msg.style.cssText='position:absolute;bottom:8px;left:8px;background:#fff;padding:.4rem .6rem;border-radius:6px;font-size:.7rem;box-shadow:0 2px 4px rgba(0,0,0,.15);';
-            msg.textContent='No se pudo cargar el mapa completo';
-            mapEl.appendChild(msg);
-        })
-        .finally(()=>{
-            mapEl.classList.remove('coverage-map-loading');
-            const fallback = mapEl.querySelector('.coverage-map-fallback');
-            if (fallback) fallback.remove();
-        });
-}
 
 // Inicialización principal
 document.addEventListener('DOMContentLoaded', () => {
@@ -366,7 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarBotonSolicitar();
     configurarScrollSuave();
     configurarAnimaciones();
-    configurarMapaCobertura();
     actualizarResumen();
     // establecer fecha mínima
     const inputFecha = $('#campo-fecha');

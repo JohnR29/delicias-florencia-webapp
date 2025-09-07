@@ -6,8 +6,6 @@
     <meta name="description" content="Delicias Florencia: tortas caseras en vaso artesanales. Sabores, precios por cantidad y entrega a domicilio en la Región Metropolitana.">
     <title>Delicias Florencia - Tortas Caseras en Vaso</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Leaflet CSS para el mapa de cobertura -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -183,14 +181,11 @@
             <p class="section-subtitle">Entregamos en las siguientes comunas de la Región Metropolitana</p>
             
             <div class="cobertura-content">
-                <div class="cobertura-map">
-                    <div id="coverage-map" aria-label="Mapa con comunas donde realizamos entregas">
-                        <!-- Fallback accesible si el mapa no carga -->
-                        <div class="coverage-map-fallback">
-                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
-                            <p>Mapa cargando…</p>
-                        </div>
-                    </div>
+                <div class="cobertura-map" style="display:flex;align-items:center;justify-content:center;">
+                    <figure style="max-width:420px;width:100%;margin:0;">
+                        <img src="coverage.svg" alt="Área conjunta aproximada de cobertura: San Bernardo, La Pintana, El Bosque y La Cisterna" style="width:100%;height:auto;display:block;border-radius:16px;box-shadow:var(--shadow);" loading="lazy">
+                        <figcaption style="text-align:center;font-size:.8rem;color:var(--text-light);margin-top:.4rem;">Cobertura (representación esquemática, no mapa exacto)</figcaption>
+                    </figure>
                 </div>
                 <div class="cobertura-list">
                     <h3>Comunas que atendemos:</h3>
@@ -309,8 +304,6 @@
             </div>
         </div>
     </footer>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="script.js"></script>
 </body>
 </html>
