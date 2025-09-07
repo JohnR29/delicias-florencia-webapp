@@ -8,14 +8,14 @@ const UMBRAL_TIER3 = 20; // desde 20
 const PRECIO_TIER1 = 1700; // 6 - 14
 const PRECIO_TIER2 = 1600; // 15 - 19
 const PRECIO_TIER3 = 1500; // 20+
-const EMAIL_DESTINO = 'deliciasflorencia@email.com'; // TODO: parametrizar
+const EMAIL_DESTINO = 'johnrojas297@gmail.com'; // TODO: parametrizar
 const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna']);
 // Coordenadas aproximadas de comunas (centroides simplificados)
 const COMUNAS_COORDS = Object.freeze({
-    'San Bernardo': { lat: -33.5933, lng: -70.6996 },
-    'La Pintana': { lat: -33.5835, lng: -70.6296 },
-    'El Bosque': { lat: -33.5694, lng: -70.6765 },
-    'La Cisterna': { lat: -33.5539, lng: -70.6503 }
+    'San Bernardo': { lat: -33.6006, lng: -70.708 },
+    'La Pintana': { lat: -33.581, lng: -70.6311 },
+    'El Bosque': { lat: -33.5664, lng: -70.6738 },
+    'La Cisterna': { lat: -33.5326, lng: -70.6616 }
 });
 
 // ==========================
