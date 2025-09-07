@@ -344,7 +344,11 @@ function configurarMapaCobertura() {
             }
             const hull = convexHull(allPoints);
             if (hull.length) {
-                L.polygon(hull.map(([lng,lat])=>[lat,lng]), { color:'#7A9A7E', weight:2, fill:false, dashArray:'6 4', interactive:false }).addTo(map);
+                const hullLatLng = hull.map(([lng,lat])=>[lat,lng]);
+                // Capa de color morado claro (fondo unificado)
+                L.polygon(hullLatLng, { stroke:false, fillColor:'#c9b3ff', fillOpacity:0.20, interactive:false }).addTo(map).bringToBack();
+                // Contorno externo existente
+                L.polygon(hullLatLng, { color:'#7A9A7E', weight:2, fill:false, dashArray:'6 4', interactive:false }).addTo(map);
             }
         })
         .catch(err => console.error('Error mapa cobertura', err))
