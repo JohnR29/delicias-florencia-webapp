@@ -297,18 +297,18 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
 .logo-img {
     height: 60px;
     width: auto;
-    /* Mejorar visibilidad del logo con fondo transparente */
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-    /* Fondo sutil de respaldo para mejor contraste */
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 4px 8px;
+    /* Eliminar fondo blanco del logo */
+    mix-blend-mode: multiply;
+    /* Alternativa: usar filter para eliminar blancos */
+    /* filter: contrast(1.2) brightness(1.1); */
+    /* Sombra sutil para mejor definición */
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
     transition: var(--transition);
 }
 
 .logo-img:hover {
-    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
-    background: rgba(255, 255, 255, 0.1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    transform: scale(1.02);
 }
 
 .nav-menu {
@@ -869,11 +869,10 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
 .footer-logo {
     height: 80px;
     margin-bottom: 1rem;
-    /* Aplicar los mismos estilos que el logo principal */
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 4px 8px;
+    /* Eliminar fondo blanco del logo */
+    mix-blend-mode: multiply;
+    /* Sombra sutil para mejor definición */
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1));
     transition: var(--transition);
 }
 
