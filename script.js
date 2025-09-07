@@ -17,6 +17,70 @@ const COMUNAS_COORDS = Object.freeze({
     'El Bosque': { lat: -33.5694, lng: -70.6765 },
     'La Cisterna': { lat: -33.5539, lng: -70.6503 }
 });
+// GeoJSON MUY simplificado (solo demostrativo, no usar para navegación exacta)
+const COMUNAS_GEOJSON = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": { "nombre": "San Bernardo" },
+            "geometry": { "type": "Polygon", "coordinates": [[
+                [-70.7315,-33.5755],
+                [-70.7220,-33.6075],
+                [-70.7005,-33.6230],
+                [-70.6680,-33.6200],
+                [-70.6565,-33.6000],
+                [-70.6665,-33.5800],
+                [-70.6885,-33.5660],
+                [-70.7130,-33.5640],
+                [-70.7315,-33.5755]
+            ]] }
+        },
+        {
+            "type": "Feature",
+            "properties": { "nombre": "La Pintana" },
+            "geometry": { "type": "Polygon", "coordinates": [[
+                [-70.6515,-33.5600],
+                [-70.6420,-33.5860],
+                [-70.6310,-33.5985],
+                [-70.6105,-33.5985],
+                [-70.6025,-33.5830],
+                [-70.6085,-33.5655],
+                [-70.6235,-33.5535],
+                [-70.6405,-33.5525],
+                [-70.6515,-33.5600]
+            ]] }
+        },
+        {
+            "type": "Feature",
+            "properties": { "nombre": "El Bosque" },
+            "geometry": { "type": "Polygon", "coordinates": [[
+                [-70.7070,-33.5465],
+                [-70.7035,-33.5670],
+                [-70.6885,-33.5745],
+                [-70.6660,-33.5710],
+                [-70.6630,-33.5535],
+                [-70.6745,-33.5430],
+                [-70.6935,-33.5395],
+                [-70.7070,-33.5465]
+            ]] }
+        },
+        {
+            "type": "Feature",
+            "properties": { "nombre": "La Cisterna" },
+            "geometry": { "type": "Polygon", "coordinates": [[
+                [-70.6660,-33.5305],
+                [-70.6605,-33.5440],
+                [-70.6465,-33.5480],
+                [-70.6340,-33.5440],
+                [-70.6320,-33.5350],
+                [-70.6400,-33.5265],
+                [-70.6530,-33.5245],
+                [-70.6660,-33.5305]
+            ]] }
+        }
+    ]
+};
 
 // ==========================
 // Utilidades
@@ -312,15 +376,35 @@ function configurarMapaCobertura() {
         maxZoom: 18,
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
-    const bounds = [];
-    Object.entries(COMUNAS_COORDS).forEach(([nombre, {lat, lng}]) => {
-        const marker = L.marker([lat, lng], { title: nombre }).addTo(map);
-        marker.bindPopup(`<strong>${nombre}</strong><br/>Entrega a domicilio`);
-        // círculo de referencia (radio arbitrario pequeño)
-        L.circle([lat, lng], { radius: 1200, color: '#E8B4B8', fillColor: '#E8B4B8', fillOpacity: 0.15, weight:1 }).addTo(map);
-        bounds.push([lat, lng]);
+    function baseStyle() {
+        return {
+            color: '#E8B4B8',
+            weight: 2,
+            fillColor: '#E8B4B8',
+            fillOpacity: 0.25,
+            interactive: true
+        };
+    }
+    function highlight(e){
+        const layer = e.target;
+        layer.setStyle({ weight: 3, fillOpacity: 0.4 });
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+    }
+    function reset(e){ geojson.resetStyle(e.target); }
+    function onFeature(feature, layer){
+        const nombre = feature.properties?.nombre || 'Comuna';
+        layer.bindPopup(`<strong>${nombre}</strong><br/>Zona de entrega`);
+        layer.on({ mouseover: highlight, mouseout: reset });
+    }
+    const geojson = L.geoJSON(COMUNAS_GEOJSON, { style: baseStyle, onEachFeature: onFeature }).addTo(map);
+    try { map.fitBounds(geojson.getBounds(), { padding: [20,20] }); } catch(_) {}
+    // Agregar marcadores centrados
+    Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
+        L.marker([lat,lng], { title: nombre, alt: nombre }).addTo(map)
+            .bindTooltip(nombre, { direction: 'top', offset: [0,-6] });
     });
-    if (bounds.length) map.fitBounds(bounds, { padding: [20,20] });
     // Accesibilidad: remover fallback
     const fallback = mapEl.querySelector('.coverage-map-fallback');
     if (fallback) fallback.remove();
