@@ -312,53 +312,60 @@ function configurarMapaCobertura() {
     fetch('comunas.geojson')
         .then(r=>r.json())
         .then(data => {
-            // Estilo visible por defecto para que nunca "desaparezca" el polígono
-            const baseStyle = () => ({
-                weight: 1,
-                color: '#8A5FD1',
-                fillColor: '#bfa2ff',
-                fillOpacity: 0.35,
-                interactive: true
-            });
-            function highlight(e){ e.target.setStyle({ weight:2, fillOpacity:.55 }); }
-            function reset(e){ e.target.setStyle({ weight:1, fillOpacity:.35 }); }
-            function onEach(f,l){
-                const nombre=f.properties?.NOMBRE||'Comuna';
-                l.bindPopup(`<strong>${nombre}</strong><br/>Cobertura disponible`);
-                l.on({mouseover:highlight,mouseout:reset});
-            }
-
-            const geoLayer = L.geoJSON(data, { style: baseStyle, onEachFeature: onEach });
-
-            let unionFeature = null;
-            if (window.turf) {
+            // Queremos UNA sola forma visual que represente el área total de cobertura.
+            // Paso 1: intentamos unión real con turf.union acumulativa.
+            let unified = null;
+            const feats = (data && data.features) ? data.features : [];
+            if (window.turf && feats.length) {
                 try {
-                    const feats = data.features || [];
-                    if (feats.length) {
-                        // Reducimos con union; si falla en algún paso, salimos y usamos geoLayer
-                        unionFeature = feats.reduce((acc, f) => {
-                            if (!acc) return f;
-                            try { return turf.union(acc, f); } catch { return acc; }
-                        }, null);
-                        // Validación rápida: que tenga geometry y tipo Polygon/MultiPolygon
-                        if (!unionFeature || !unionFeature.geometry || !/Polygon/i.test(unionFeature.geometry.type)) {
-                            unionFeature = null;
-                        }
+                    unified = feats.reduce((acc,f)=>{
+                        if (!acc) return f; // primer feature
+                        try { return turf.union(acc,f); } catch { return acc; }
+                    }, null);
+                } catch(err) {
+                    console.warn('Error uniendo con turf.union', err);
+                    unified = null;
+                }
+            }
+            // Paso 2: si la unión falló o quedó en null, generamos un MultiPolygon directo.
+            if (!unified && feats.length) {
+                const multi = {
+                    type:'Feature',
+                    properties:{ NOMBRE:'Cobertura' },
+                    geometry:{ type:'MultiPolygon', coordinates: feats.map(f=>f.geometry.coordinates) }
+                };
+                unified = multi;
+            }
+            // Paso 3: si aún sin unified, abortamos.
+            if (!unified) {
+                console.error('No se pudo construir polígono de cobertura');
+                return;
+            }
+            // Opcional: si la unión resultó en múltiple geometría y queremos contorno único, intentar hull.
+            if (window.turf && unified.geometry && unified.geometry.type === 'MultiPolygon') {
+                try {
+                    const fc = turf.featureCollection(feats);
+                    const hull = turf.convex(fc);
+                    if (hull && hull.geometry) {
+                        // Usamos hull solo si reduce número de polígonos (representación externa) sin fallar.
+                        unified = hull; // Comentado si se prefiere mantener multipolygon exacto.
                     }
                 } catch(err) {
-                    console.warn('Fallo union Turf, usando capas individuales', err);
-                    unionFeature = null;
+                    // Silencioso: mantenemos multipolygon
                 }
             }
 
-            if (unionFeature) {
-                const unionLayer = L.geoJSON(unionFeature, { style: () => ({ weight:3, color:'#5E31B9', fillColor:'#bfa2ff', fillOpacity:.45 }) }).addTo(map);
-                geoLayer.addTo(map); // también mostramos límites individuales para interacción homogénea
-                try { map.fitBounds(unionLayer.getBounds(), { padding:[25,25] }); } catch(_){ }
-            } else {
-                geoLayer.addTo(map);
-                try { map.fitBounds(geoLayer.getBounds(), { padding:[25,25] }); } catch(_){ }
-            }
+            const styleUnified = () => ({
+                weight: 3,
+                color: '#5E31B9',
+                fillColor: '#bfa2ff',
+                fillOpacity: 0.5,
+                interactive: true
+            });
+            const layer = L.geoJSON(unified, { style: styleUnified, onEachFeature: (f,l)=>{
+                l.bindPopup('<strong>Zona de Cobertura</strong><br/>San Bernardo, La Pintana, El Bosque y La Cisterna');
+            }}).addTo(map);
+            try { map.fitBounds(layer.getBounds(), { padding:[25,25] }); } catch(_){ }
             Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
                 L.marker([lat,lng], { title:nombre }).addTo(map).bindTooltip(nombre, {direction:'top', offset:[0,-6]});
             });
