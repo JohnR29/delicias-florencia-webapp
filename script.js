@@ -17,70 +17,6 @@ const COMUNAS_COORDS = Object.freeze({
     'El Bosque': { lat: -33.5694, lng: -70.6765 },
     'La Cisterna': { lat: -33.5539, lng: -70.6503 }
 });
-// GeoJSON MUY simplificado (solo demostrativo, no usar para navegación exacta)
-const COMUNAS_GEOJSON = {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "properties": { "nombre": "San Bernardo" },
-            "geometry": { "type": "Polygon", "coordinates": [[
-                [-70.7315,-33.5755],
-                [-70.7220,-33.6075],
-                [-70.7005,-33.6230],
-                [-70.6680,-33.6200],
-                [-70.6565,-33.6000],
-                [-70.6665,-33.5800],
-                [-70.6885,-33.5660],
-                [-70.7130,-33.5640],
-                [-70.7315,-33.5755]
-            ]] }
-        },
-        {
-            "type": "Feature",
-            "properties": { "nombre": "La Pintana" },
-            "geometry": { "type": "Polygon", "coordinates": [[
-                [-70.6515,-33.5600],
-                [-70.6420,-33.5860],
-                [-70.6310,-33.5985],
-                [-70.6105,-33.5985],
-                [-70.6025,-33.5830],
-                [-70.6085,-33.5655],
-                [-70.6235,-33.5535],
-                [-70.6405,-33.5525],
-                [-70.6515,-33.5600]
-            ]] }
-        },
-        {
-            "type": "Feature",
-            "properties": { "nombre": "El Bosque" },
-            "geometry": { "type": "Polygon", "coordinates": [[
-                [-70.7070,-33.5465],
-                [-70.7035,-33.5670],
-                [-70.6885,-33.5745],
-                [-70.6660,-33.5710],
-                [-70.6630,-33.5535],
-                [-70.6745,-33.5430],
-                [-70.6935,-33.5395],
-                [-70.7070,-33.5465]
-            ]] }
-        },
-        {
-            "type": "Feature",
-            "properties": { "nombre": "La Cisterna" },
-            "geometry": { "type": "Polygon", "coordinates": [[
-                [-70.6660,-33.5305],
-                [-70.6605,-33.5440],
-                [-70.6465,-33.5480],
-                [-70.6340,-33.5440],
-                [-70.6320,-33.5350],
-                [-70.6400,-33.5265],
-                [-70.6530,-33.5245],
-                [-70.6660,-33.5305]
-            ]] }
-        }
-    ]
-};
 
 // ==========================
 // Utilidades
@@ -369,6 +305,7 @@ function configurarAnimaciones() {
 function configurarMapaCobertura() {
     const mapEl = document.getElementById('coverage-map');
     if (!mapEl || typeof L === 'undefined') return; // Leaflet no cargó
+    mapEl.classList.add('coverage-map-loading');
     // Centro promedio simple
     const centro = [-33.575, -70.665];
     const map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true }).setView(centro, 12);
@@ -376,38 +313,49 @@ function configurarMapaCobertura() {
         maxZoom: 18,
         attribution: '&copy; OpenStreetMap'
     }).addTo(map);
-    function baseStyle() {
-        return {
-            color: '#E8B4B8',
-            weight: 2,
-            fillColor: '#E8B4B8',
-            fillOpacity: 0.25,
-            interactive: true
-        };
-    }
-    function highlight(e){
-        const layer = e.target;
-        layer.setStyle({ weight: 3, fillOpacity: 0.4 });
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-    }
-    function reset(e){ geojson.resetStyle(e.target); }
-    function onFeature(feature, layer){
-        const nombre = feature.properties?.nombre || 'Comuna';
-        layer.bindPopup(`<strong>${nombre}</strong><br/>Zona de entrega`);
-        layer.on({ mouseover: highlight, mouseout: reset });
-    }
-    const geojson = L.geoJSON(COMUNAS_GEOJSON, { style: baseStyle, onEachFeature: onFeature }).addTo(map);
-    try { map.fitBounds(geojson.getBounds(), { padding: [20,20] }); } catch(_) {}
-    // Agregar marcadores centrados
-    Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
-        L.marker([lat,lng], { title: nombre, alt: nombre }).addTo(map)
-            .bindTooltip(nombre, { direction: 'top', offset: [0,-6] });
-    });
-    // Accesibilidad: remover fallback
-    const fallback = mapEl.querySelector('.coverage-map-fallback');
-    if (fallback) fallback.remove();
+    // URL de GeoJSON comunas RM (ejemplo: repositorio público). Si deseas hostear local, coloca archivo comunas.geojson en raíz y cambia la ruta.
+    const GEOJSON_URL = 'comunas.geojson'; // Archivo local servido por GitHub Pages
+    fetch(GEOJSON_URL)
+        .then(r => r.json())
+        .then(data => {
+            // Algunos datasets usan propiedades: NOMBRE, comuna, name, etc.
+            const targetNames = new Set(COMUNAS_PERMITIDAS.map(n => n.toLowerCase()));
+            const filtered = {
+                type: 'FeatureCollection',
+                features: data.features.filter(f => {
+                    const props = f.properties || {};
+                    const nombre = (props.NOMBRE || props.nombre || props.name || '').toLowerCase();
+                    return targetNames.has(nombre);
+                })
+            };
+            function style() { return { color:'#E8B4B8', weight:2, fillColor:'#E8B4B8', fillOpacity:.3 }; }
+            function highlight(e){ e.target.setStyle({ weight:3, fillOpacity:.45 }); }
+            function reset(e){ geojson.resetStyle(e.target); }
+            function onEach(feature, layer){
+                const props = feature.properties || {};
+                const nombre = props.NOMBRE || props.nombre || props.name || 'Comuna';
+                layer.bindPopup(`<strong>${nombre}</strong><br/>Cobertura disponible`);
+                layer.on({ mouseover: highlight, mouseout: reset });
+            }
+            const geojson = L.geoJSON(filtered, { style, onEachFeature: onEach }).addTo(map);
+            try { map.fitBounds(geojson.getBounds(), { padding:[25,25] }); } catch(_) {}
+            // Marcadores opcionales
+            Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
+                L.marker([lat,lng], { title:nombre }).addTo(map).bindTooltip(nombre, {direction:'top', offset:[0,-6]});
+            });
+        })
+        .catch(err => {
+            console.error('Error cargando GeoJSON comunas', err);
+            const msg = document.createElement('div');
+            msg.style.cssText='position:absolute;bottom:8px;left:8px;background:#fff;padding:.4rem .6rem;border-radius:6px;font-size:.7rem;box-shadow:0 2px 4px rgba(0,0,0,.15);';
+            msg.textContent='No se pudo cargar el mapa completo';
+            mapEl.appendChild(msg);
+        })
+        .finally(()=>{
+            mapEl.classList.remove('coverage-map-loading');
+            const fallback = mapEl.querySelector('.coverage-map-fallback');
+            if (fallback) fallback.remove();
+        });
 }
 
 // Inicialización principal
