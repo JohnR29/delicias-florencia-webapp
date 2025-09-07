@@ -108,21 +108,9 @@
     <section id="precios" class="precios">
         <div class="container">
             <h2 class="section-title">Precios</h2>
-            <div class="precios-simple" aria-label="Resumen de precios por tramo">
-                <div class="precio-mejor" role="group" aria-label="Mejor precio disponible">
-                    <span class="pm-etiqueta">Mejor precio</span>
-                    <div class="pm-valor" id="pm-valor" aria-live="polite" aria-label="Precio mejor tramo">
-                        <span class="pm-monto" id="pm-mejor-monto">$1.500</span>
-                        <span class="pm-unidad">c/u</span>
-                    </div>
-                    <p class="pm-detalle" id="pm-detalle-text">Desde 20 unidades · Combina sabores</p>
-                    <a href="#cotizar" class="pm-cta" aria-label="Ir a cotizar con mejor precio">Cotizar</a>
-                </div>
-                <p class="linea-tramos" id="linea-tramos" aria-label="Otros tramos">
-                    6-14: <strong>$1.700</strong> · 15-19: <strong>$1.600</strong> · 20+: <strong>$1.500</strong>
-                </p>
-                <p class="nota-minimo" id="nota-minimo">Pedido mínimo 6 unidades.</p>
-            </div>
+            <div id="precios-cards" class="precios-cards" aria-label="Tramos de precios" data-dynamic="true"></div>
+            <p class="social-proof-precios" id="social-proof-precios" aria-live="polite">Más del 60% elige 20+ unidades</p>
+            <p class="nota-minimo" id="nota-minimo">Pedido mínimo 6 unidades.</p>
         </div>
     </section>
 

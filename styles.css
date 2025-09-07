@@ -523,51 +523,52 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     background: linear-gradient(135deg, var(--accent-color) 0%, #FFF 100%);
 }
 
-/* Nueva versión simplificada de precios */
-.precios-simple {
-    max-width: 680px;
-    margin: 0 auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
+/* Tarjetas de precios (3 tramos) */
+.precios-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(230px,1fr));
+    gap: 1.7rem;
+    margin: 2.2rem auto 1.6rem;
+    max-width: 980px;
 }
-.precio-mejor {
-    background: var(--white);
-    border: 3px solid var(--secondary-color);
-    border-radius: 22px;
-    padding: 1.8rem 1.5rem 2rem;
+.precio-tramo {
+    --highlight-scale: 1.06;
     position: relative;
-    box-shadow: 0 6px 25px -8px rgba(0,0,0,.15);
+    background: var(--white);
+    border-radius: 20px;
+    padding: 1.4rem 1.3rem 1.6rem;
+    border: 2.5px solid #f1e4e4;
+    box-shadow: 0 6px 22px -8px rgba(0,0,0,.12);
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:.6rem;
+    transition:.35s;
 }
-.pm-etiqueta {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
+.precio-tramo:hover { transform: translateY(-6px); box-shadow:0 12px 32px -10px rgba(0,0,0,.18); }
+.precio-tramo[data-best="true"] {
+    border-color: var(--secondary-color);
+    transform: scale(var(--highlight-scale));
+    box-shadow:0 10px 38px -6px rgba(0,0,0,.22);
+    background: linear-gradient(135deg,#ffffff 0%, #f1fff3 100%);
+}
+.precio-tramo[data-best="true"] .pt-monto { color: #4d7f54; }
+.precio-tramo-badge {
+    position:absolute;
+    top:-10px; left:50%; transform:translateX(-50%);
     background: var(--secondary-color);
-    color: #fff;
-    padding: .35rem 1.2rem .4rem;
-    font-size: .7rem;
-    font-weight: 600;
-    letter-spacing: .5px;
-    border-radius: 40px;
-    text-transform: uppercase;
-    box-shadow: 0 4px 10px -2px rgba(0,0,0,.25);
+    color:#fff; padding:.35rem .95rem .4rem; border-radius:40px; font-size:.62rem; letter-spacing:.7px; font-weight:600; text-transform:uppercase; box-shadow:0 4px 12px -3px rgba(0,0,0,.35);
 }
-.pm-valor { display:flex; align-items:baseline; justify-content:center; gap:.6rem; margin-bottom:.4rem; }
-.pm-monto { font-size: clamp(2.4rem,6vw,3.2rem); font-weight:700; font-family: 'Poppins',sans-serif; color: var(--secondary-color); line-height:1; }
-.pm-unidad { font-size:.9rem; font-weight:600; color: var(--text-light); letter-spacing:.5px; text-transform:uppercase; }
-.pm-detalle { font-size:.85rem; color: var(--text-light); letter-spacing:.3px; }
-.pm-cta { display:inline-block; margin-top:1rem; background: linear-gradient(45deg,var(--secondary-color), var(--primary-color)); color:#fff; text-decoration:none; padding:.7rem 1.4rem; border-radius:40px; font-size:.8rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; transition:.25s; }
-.pm-cta:hover { transform:translateY(-2px); box-shadow:0 6px 18px -4px rgba(0,0,0,.25); }
-.linea-tramos { font-size:.8rem; color: var(--text-dark); background: #ffffffb8; padding:.65rem .9rem; border:1px solid #e7dede; border-radius: 50px; letter-spacing:.5px; }
-.linea-tramos strong { color: var(--text-dark); font-weight:600; }
-.nota-minimo { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color: var(--text-light); font-weight:600; }
-
-@media (max-width:600px) {
-    .pm-monto { font-size: clamp(2rem,10vw,2.6rem); }
-    .linea-tramos { font-size:.72rem; }
+.pt-titulo { font-size:.8rem; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color: var(--text-light); }
+.pt-monto { font-size: clamp(2.1rem,5.2vw,2.6rem); font-weight:700; font-family:'Poppins',sans-serif; line-height:1; color: var(--primary-color); }
+.pt-unit { font-size:.65rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color: var(--text-light); }
+.pt-rango { font-size:.75rem; font-weight:500; letter-spacing:.4px; color: var(--text-dark); }
+.pt-ahorro { font-size:.65rem; color:#6a8c6d; letter-spacing:.5px; font-weight:600; text-transform:uppercase; min-height:1.2em; }
+.pt-ahorro strong { color:#4d7f54; }
+.pt-cta { margin-top:.4rem; font-size:.7rem; letter-spacing:.6px; font-weight:600; text-transform:uppercase; background: linear-gradient(45deg,var(--secondary-color), var(--primary-color)); color:#fff; padding:.55rem 1.1rem; border:none; border-radius:40px; cursor:pointer; transition:.3s; }
+.pt-cta:hover { transform:translateY(-3px); box-shadow:0 8px 20px -6px rgba(0,0,0,.28); }
+.nota-minimo { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color: var(--text-light); font-weight:600; text-align:center; }
+.social-proof-precios { text-align:center; font-size:.75rem; letter-spacing:.5px; font-weight:600; color:#4d7f54; margin-top:.2rem; }
+@media (max-width:760px){
+    .precios-cards { gap:1.3rem; }
+    .precio-tramo[data-best="true"] { transform: scale(1.03); }
 }
 
 /* Cobertura Section */

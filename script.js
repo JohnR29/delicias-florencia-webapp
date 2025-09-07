@@ -369,21 +369,58 @@ function configurarMapaCobertura() {
         });
 }
 
-// Precios simplificados dinámicos (evitar duplicar números en HTML)
-function configurarPreciosSimplificados() {
-    const mejorMontoEl = $('#pm-mejor-monto');
-    const detalleEl = $('#pm-detalle-text');
-    const lineaTramosEl = $('#linea-tramos');
-    const notaMinimoEl = $('#nota-minimo');
-    if (!mejorMontoEl || !detalleEl || !lineaTramosEl || !notaMinimoEl) return;
-    // Mejor tramo siempre el de menor precio (tier 3)
-    mejorMontoEl.textContent = `$${PRECIO_TIER3.toLocaleString('es-CL')}`;
-    detalleEl.textContent = `Desde ${UMBRAL_TIER3}+ unidades · Combina sabores`;
-    lineaTramosEl.innerHTML = `
-        ${MINIMO_PEDIDO}-${UMBRAL_TIER2 - 1}: <strong>$${PRECIO_TIER1.toLocaleString('es-CL')}</strong>
-        · ${UMBRAL_TIER2}-${UMBRAL_TIER3 - 1}: <strong>$${PRECIO_TIER2.toLocaleString('es-CL')}</strong>
-        · ${UMBRAL_TIER3}+: <strong>$${PRECIO_TIER3.toLocaleString('es-CL')}</strong>`;
-    notaMinimoEl.textContent = `Pedido mínimo ${MINIMO_PEDIDO} unidades.`;
+// Generar tarjetas de tramos de precio
+function renderPreciosTramos() {
+    const cont = document.getElementById('precios-cards');
+    if (!cont) return;
+    const tramos = [
+        {
+            titulo:'Tramo 1',
+            rango:`${MINIMO_PEDIDO} - ${UMBRAL_TIER2 - 1} uds`,
+            precio:PRECIO_TIER1,
+            ahorro:null
+        },
+        {
+            titulo:'Tramo 2',
+            rango:`${UMBRAL_TIER2} - ${UMBRAL_TIER3 - 1} uds`,
+            precio:PRECIO_TIER2,
+            ahorro: PRECIO_TIER1 - PRECIO_TIER2
+        },
+        {
+            titulo:'Tramo 3',
+            rango:`${UMBRAL_TIER3}+ uds`,
+            precio:PRECIO_TIER3,
+            ahorro: PRECIO_TIER2 - PRECIO_TIER3
+        }
+    ];
+    const menorPrecio = Math.min(...tramos.map(t=>t.precio));
+    cont.innerHTML = tramos.map(t => {
+        const best = t.precio === menorPrecio;
+        let ahorroTxt = '';
+        if (t.ahorro) {
+            const prevPrecio = t.precio + t.ahorro; // reconstruir precio anterior
+            const pct = ((t.ahorro / prevPrecio) * 100).toFixed(0);
+            ahorroTxt = `Ahorro $${t.ahorro.toLocaleString('es-CL')} c/u · <strong>↓${pct}%</strong>`;
+        }
+        return `<article class="precio-tramo" data-best="${best}" aria-label="${t.titulo} ${t.rango} precio $${t.precio.toLocaleString('es-CL')}${best?' mejor precio':''}">
+            ${best ? '<span class="precio-tramo-badge">Mejor precio</span>' : ''}
+            <h3 class="pt-titulo">${t.titulo}</h3>
+            <div class="pt-monto" aria-hidden="true">$${t.precio.toLocaleString('es-CL')}</div>
+            <div class="pt-unit">c/u</div>
+            <div class="pt-rango">${t.rango}</div>
+            <div class="pt-ahorro">${ahorroTxt}</div>
+            <button class="pt-cta" data-ir-cotizar="true" aria-label="Usar ${t.titulo} para cotizar">Cotizar</button>
+        </article>`;
+    }).join('');
+
+    cont.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button[data-ir-cotizar]');
+        if (!btn) return;
+        const destino = document.getElementById('cotizar');
+        if (destino) destino.scrollIntoView({behavior:'smooth'});
+    });
+    const nota = document.getElementById('nota-minimo');
+    if (nota) nota.textContent = `Pedido mínimo ${MINIMO_PEDIDO} unidades. Puedes combinar sabores.`;
 }
 
 
@@ -396,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarScrollSuave();
     configurarAnimaciones();
     configurarMapaCobertura();
-    configurarPreciosSimplificados();
+    renderPreciosTramos();
     actualizarResumen();
     // establecer fecha mínima
     const inputFecha = $('#campo-fecha');
