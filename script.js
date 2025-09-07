@@ -40,10 +40,10 @@ function announce(msg) {
 // Datos (restaurado)
 // ==========================
 const saboresData = Object.freeze([
-    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'] },
-    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'] },
-    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'] },
-    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'] }
+    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'], imagen: 'pina-crema.jpg' },
+    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'], imagen: 'oreo.jpg' },
+    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'], imagen: 'tres-leches.png' },
+    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'], imagen: 'selva-negra.jpg' }
 ]);
 
 const cantidades = Object.fromEntries(saboresData.map(s => [s.key, 0]));
@@ -60,7 +60,9 @@ function renderSaboresPedido() {
         <div class="sabor-card-pedido" data-sabor="${s.key}">
             <h3>${s.nombre}</h3>
             <div class="sabor-img-ingredientes">
-                <div class="sabor-img-placeholder" aria-hidden="true"></div>
+                <div class="sabor-img-container">
+                    <img src="${s.imagen}" alt="${s.nombre} - Torta artesanal" class="sabor-img" loading="lazy" decoding="async">
+                </div>
                 <div class="sabor-ingredientes">
                     <strong>Ingredientes:</strong>
                     <ul>${ingredientes}</ul>

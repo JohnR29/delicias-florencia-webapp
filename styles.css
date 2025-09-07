@@ -38,12 +38,23 @@
     align-items: center;
     margin-bottom: 1rem;
 }
-.sabor-img-placeholder {
+.sabor-img-container {
     width: 100px;
     height: 120px;
-    background: #f4f4f4;
-    border: 1px solid #ccc;
     border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.sabor-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.3s ease;
+}
+.sabor-img:hover {
+    transform: scale(1.05);
 }
 .sabor-ingredientes ul {
     margin: 0.5rem 0 0 0;
@@ -1036,7 +1047,7 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
         flex-direction: row;
         gap: .75rem;
     }
-    .sabor-img-placeholder { width:70px; height:85px; }
+    .sabor-img-container { width:70px; height:85px; }
     .sabor-card-pedido { padding: .85rem .85rem 1rem; }
     .sabor-cantidad-row { transform: scale(.9); }
     .sabor-cantidad-row button { width: 50px; }
