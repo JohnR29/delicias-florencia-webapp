@@ -224,7 +224,7 @@ function dispararSolicitud(e) {
     body += `Precio unitario: $${precioUnitario.toLocaleString('es-CL')}%0D%0A`;
     body += `Total: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
     body += `%0D%0AOrigen: Sitio Web Delicias Florencia`;
-    const subject = `Cotización web (${totalCantidad} uds)`;
+    const subject = `Cotización web ${nombre} (${totalCantidad} uds)`;
     const mailtoUrl = `mailto:${EMAIL_DESTINO}?subject=${encodeURIComponent(subject)}&body=${body}`;
     window.location.href = mailtoUrl;
     mostrarMensajeExito();
