@@ -236,8 +236,19 @@
                     <input id="campo-fecha" name="fecha" type="date" required />
                 </div>
                 <div class="resumen-form-group">
-                    <label for="campo-direccion">Dirección / Comuna</label>
-                    <input id="campo-direccion" name="direccion" type="text" placeholder="Comuna o dirección" />
+                    <label for="campo-comuna">Comuna <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <select id="campo-comuna" name="comuna" required>
+                        <option value="" disabled selected>Selecciona...</option>
+                        <option value="San Bernardo">San Bernardo</option>
+                        <option value="La Pintana">La Pintana</option>
+                        <option value="El Bosque">El Bosque</option>
+                        <option value="La Cisterna">La Cisterna</option>
+                    </select>
+                    <small class="hint-comuna">Solo entregamos en estas comunas</small>
+                </div>
+                <div class="resumen-form-group">
+                    <label for="campo-direccion">Dirección completa <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-direccion" name="direccion" type="text" required placeholder="Calle, número, depto, villa..." />
                 </div>
                 <div class="resumen-form-group">
                     <label for="campo-comentarios">Comentarios</label>

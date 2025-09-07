@@ -9,6 +9,7 @@ const PRECIO_TIER1 = 1700; // 6 - 14
 const PRECIO_TIER2 = 1600; // 15 - 19
 const PRECIO_TIER3 = 1500; // 20+
 const EMAIL_DESTINO = 'deliciasflorencia@email.com'; // TODO: parametrizar
+const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna']);
 
 // ==========================
 // Utilidades
@@ -182,12 +183,17 @@ function configurarBotonSolicitar() {
         const nombre = $('#campo-nombre')?.value.trim();
         const telefono = $('#campo-telefono')?.value.trim();
         const fecha = $('#campo-fecha')?.value;
-        const direccion = $('#campo-direccion')?.value.trim();
+    const comuna = $('#campo-comuna')?.value;
+    const direccion = $('#campo-direccion')?.value.trim();
         const comentarios = $('#campo-comentarios')?.value.trim();
 
         // Validación básica
-        if (!nombre || !telefono || !fecha) {
-            alert('Por favor completa Nombre, Teléfono y Fecha.');
+        if (!nombre || !telefono || !fecha || !comuna || !direccion) {
+            alert('Por favor completa Nombre, Teléfono, Fecha, Comuna y Dirección.');
+            return;
+        }
+        if (!COMUNAS_PERMITIDAS.includes(comuna)) {
+            alert('Selecciona una comuna válida.');
             return;
         }
         // Fecha mínima 4 días
@@ -204,7 +210,8 @@ function configurarBotonSolicitar() {
         body += `Nombre: ${nombre}%0D%0A`;
         body += `Teléfono: ${telefono}%0D%0A`;
         body += `Fecha deseada: ${fecha}%0D%0A`;
-        if (direccion) body += `Dirección: ${direccion}%0D%0A`;
+    body += `Comuna: ${comuna}%0D%0A`;
+    body += `Dirección: ${direccion}%0D%0A`;
         if (comentarios) body += `Comentarios: ${comentarios}%0D%0A`;
         body += `%0D%0A`;
         saboresSeleccionados.forEach(s => {
@@ -220,6 +227,7 @@ function configurarBotonSolicitar() {
         mostrarMensajeExito();
     });
 }
+
 
 function mostrarMensajeExito() {
     const mensaje = document.createElement('div');

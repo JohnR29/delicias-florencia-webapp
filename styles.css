@@ -146,7 +146,8 @@
     color: var(--text-light);
 }
 .resumen-form-group input,
-.resumen-form-group textarea {
+.resumen-form-group textarea,
+.resumen-form-group select {
     width:100%;
     border:1.5px solid #d8d8d8;
     border-radius:6px;
@@ -157,10 +158,24 @@
     transition:border-color .2s, box-shadow .2s;
 }
 .resumen-form-group input:focus,
-.resumen-form-group textarea:focus {
+.resumen-form-group textarea:focus,
+.resumen-form-group select:focus {
     outline:none;
     border-color: var(--primary-color);
     box-shadow:0 0 0 3px rgba(232,180,184,.25);
+}
+.resumen-form-group select {
+    background:#fff;
+    cursor:pointer;
+}
+.hint-comuna {
+    display:block;
+    margin-top:.25rem;
+    font-size:.65rem;
+    letter-spacing:.5px;
+    text-transform:uppercase;
+    color:#999;
+    font-weight:600;
 }
 .resumen-form-group input[required]:invalid,
 .resumen-form-group textarea[required]:invalid {
