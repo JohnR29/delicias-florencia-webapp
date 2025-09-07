@@ -37,6 +37,45 @@ function announce(msg) {
 }
 
 // ==========================
+// Datos (restaurado)
+// ==========================
+const saboresData = Object.freeze([
+    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'] },
+    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'] },
+    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'] },
+    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'] }
+]);
+
+const cantidades = Object.fromEntries(saboresData.map(s => [s.key, 0]));
+
+// ==========================
+// Render dinámico tarjetas pedido (restaurado)
+// ==========================
+function renderSaboresPedido() {
+    const cont = document.getElementById('sabores-pedido');
+    if (!cont) return;
+    cont.innerHTML = saboresData.map(s => {
+        const ingredientes = s.ingredientes.map(i => `<li>${i}</li>`).join('');
+        return `
+        <div class="sabor-card-pedido" data-sabor="${s.key}">
+            <h3>${s.nombre}</h3>
+            <div class="sabor-img-ingredientes">
+                <div class="sabor-img-placeholder" aria-hidden="true"></div>
+                <div class="sabor-ingredientes">
+                    <strong>Ingredientes:</strong>
+                    <ul>${ingredientes}</ul>
+                </div>
+            </div>
+            <div class="sabor-cantidad-row">
+                <button type="button" class="menos-btn" aria-label="Restar ${s.nombre}">-</button>
+                <span class="cantidad" aria-live="off">0</span>
+                <button type="button" class="mas-btn" aria-label="Sumar ${s.nombre}">+</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ==========================
 // Render y estado carrito (restaurado)
 // ==========================
 function actualizarResumen() {
