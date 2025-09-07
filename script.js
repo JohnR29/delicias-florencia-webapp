@@ -312,28 +312,52 @@ function configurarMapaCobertura() {
     fetch('comunas.geojson')
         .then(r=>r.json())
         .then(data => {
-            // Polígonos individuales transparentes (solo para popups / precisión)
-            function style(){ return { weight:0, fillColor:'#E8B4B8', fillOpacity:0, interactive:true }; }
-            function highlight(e){ e.target.setStyle({ fillOpacity:.15 }); }
-            function reset(e){ e.target.setStyle({ fillOpacity:0 }); }
-            function onEach(f,l){ const nombre=f.properties?.NOMBRE||'Comuna'; l.bindPopup(`<strong>${nombre}</strong><br/>Cobertura disponible`); l.on({mouseover:highlight,mouseout:reset}); }
-            const geo = L.geoJSON(data, { style, onEachFeature:onEach });
-            const union = (() => {
-                if (!window.turf) return null;
-                let acc = null;
-                geo.eachLayer(l => {
-                    const f = l.feature;
-                    if (!f) return;
-                    acc = acc ? turf.union(acc, f) : f;
-                });
-                return acc;
-            })();
-            if (union) {
-                const unionLayer = L.geoJSON(union, { style: () => ({ weight:3, color:'#8A5FD1', fillColor:'#bfa2ff', fillOpacity:.5 }) }).addTo(map);
+            // Estilo visible por defecto para que nunca "desaparezca" el polígono
+            const baseStyle = () => ({
+                weight: 1,
+                color: '#8A5FD1',
+                fillColor: '#bfa2ff',
+                fillOpacity: 0.35,
+                interactive: true
+            });
+            function highlight(e){ e.target.setStyle({ weight:2, fillOpacity:.55 }); }
+            function reset(e){ e.target.setStyle({ weight:1, fillOpacity:.35 }); }
+            function onEach(f,l){
+                const nombre=f.properties?.NOMBRE||'Comuna';
+                l.bindPopup(`<strong>${nombre}</strong><br/>Cobertura disponible`);
+                l.on({mouseover:highlight,mouseout:reset});
+            }
+
+            const geoLayer = L.geoJSON(data, { style: baseStyle, onEachFeature: onEach });
+
+            let unionFeature = null;
+            if (window.turf) {
+                try {
+                    const feats = data.features || [];
+                    if (feats.length) {
+                        // Reducimos con union; si falla en algún paso, salimos y usamos geoLayer
+                        unionFeature = feats.reduce((acc, f) => {
+                            if (!acc) return f;
+                            try { return turf.union(acc, f); } catch { return acc; }
+                        }, null);
+                        // Validación rápida: que tenga geometry y tipo Polygon/MultiPolygon
+                        if (!unionFeature || !unionFeature.geometry || !/Polygon/i.test(unionFeature.geometry.type)) {
+                            unionFeature = null;
+                        }
+                    }
+                } catch(err) {
+                    console.warn('Fallo union Turf, usando capas individuales', err);
+                    unionFeature = null;
+                }
+            }
+
+            if (unionFeature) {
+                const unionLayer = L.geoJSON(unionFeature, { style: () => ({ weight:3, color:'#5E31B9', fillColor:'#bfa2ff', fillOpacity:.45 }) }).addTo(map);
+                geoLayer.addTo(map); // también mostramos límites individuales para interacción homogénea
                 try { map.fitBounds(unionLayer.getBounds(), { padding:[25,25] }); } catch(_){ }
             } else {
-                geo.addTo(map);
-                try { map.fitBounds(geo.getBounds(), { padding:[25,25] }); } catch(_){ }
+                geoLayer.addTo(map);
+                try { map.fitBounds(geoLayer.getBounds(), { padding:[25,25] }); } catch(_){ }
             }
             Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
                 L.marker([lat,lng], { title:nombre }).addTo(map).bindTooltip(nombre, {direction:'top', offset:[0,-6]});
