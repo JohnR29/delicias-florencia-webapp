@@ -10,6 +10,13 @@ const PRECIO_TIER2 = 1600; // 15 - 19
 const PRECIO_TIER3 = 1500; // 20+
 const EMAIL_DESTINO = 'deliciasflorencia@email.com'; // TODO: parametrizar
 const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna']);
+// Coordenadas aproximadas de comunas (centroides simplificados)
+const COMUNAS_COORDS = Object.freeze({
+    'San Bernardo': { lat: -33.5933, lng: -70.6996 },
+    'La Pintana': { lat: -33.5835, lng: -70.6296 },
+    'El Bosque': { lat: -33.5694, lng: -70.6765 },
+    'La Cisterna': { lat: -33.5539, lng: -70.6503 }
+});
 
 // ==========================
 // Utilidades
@@ -294,6 +301,31 @@ function configurarAnimaciones() {
     elements.forEach(el => observer.observe(el));
 }
 
+// Mapa de cobertura con Leaflet
+function configurarMapaCobertura() {
+    const mapEl = document.getElementById('coverage-map');
+    if (!mapEl || typeof L === 'undefined') return; // Leaflet no cargó
+    // Centro promedio simple
+    const centro = [-33.575, -70.665];
+    const map = L.map(mapEl, { scrollWheelZoom: false, attributionControl: true }).setView(centro, 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+    const bounds = [];
+    Object.entries(COMUNAS_COORDS).forEach(([nombre, {lat, lng}]) => {
+        const marker = L.marker([lat, lng], { title: nombre }).addTo(map);
+        marker.bindPopup(`<strong>${nombre}</strong><br/>Entrega a domicilio`);
+        // círculo de referencia (radio arbitrario pequeño)
+        L.circle([lat, lng], { radius: 1200, color: '#E8B4B8', fillColor: '#E8B4B8', fillOpacity: 0.15, weight:1 }).addTo(map);
+        bounds.push([lat, lng]);
+    });
+    if (bounds.length) map.fitBounds(bounds, { padding: [20,20] });
+    // Accesibilidad: remover fallback
+    const fallback = mapEl.querySelector('.coverage-map-fallback');
+    if (fallback) fallback.remove();
+}
+
 // Inicialización principal
 document.addEventListener('DOMContentLoaded', () => {
     configurarNav();
@@ -302,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarBotonSolicitar();
     configurarScrollSuave();
     configurarAnimaciones();
+    configurarMapaCobertura();
     actualizarResumen();
     // establecer fecha mínima
     const inputFecha = $('#campo-fecha');
