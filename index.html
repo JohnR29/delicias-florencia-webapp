@@ -263,10 +263,16 @@
                 <span id="resumen-total">$0</span>
             </div>
             <div id="upsell-hint" class="upsell-hint" aria-live="polite"></div>
-            <button id="btn-solicitar-pedido" class="submit-button" style="margin-top:1rem;" aria-disabled="true">Solicitar pedido</button>
+            <button id="btn-solicitar-pedido" data-action="solicitar" class="submit-button" style="margin-top:1rem;" aria-disabled="true">Solicitar pedido</button>
             <div id="live-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
         </div>
     </section>
+
+    <!-- Barra móvil de acción rápida -->
+    <div id="mobile-cta-bar" class="mobile-cta-bar" aria-hidden="true">
+        <div class="m-total" id="mobile-bar-total">0 uds · $0</div>
+        <button type="button" id="btn-solicitar-mobile" data-action="solicitar" class="submit-button m-btn" disabled aria-disabled="true" aria-label="Solicitar pedido desde barra móvil">Solicitar</button>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">

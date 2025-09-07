@@ -250,6 +250,7 @@
     --shadow: 0 4px 15px rgba(0,0,0,0.1);
     --border-radius: 15px;
     --transition: all 0.3s ease;
+    --scroll-offset: 90px;
 }
 
 body {
@@ -258,6 +259,10 @@ body {
     color: var(--text-dark);
     overflow-x: hidden;
 }
+body.no-scroll { overflow: hidden; }
+
+/* Anclas compensando header fijo */
+section[id] { scroll-margin-top: var(--scroll-offset); }
 
 .container {
     max-width: 1200px;
@@ -360,9 +365,10 @@ body {
     align-items: center;
 }
 
+/* Tipografía fluida */
 .hero-title {
     font-family: 'Dancing Script', cursive;
-    font-size: 4rem;
+    font-size: clamp(2.4rem, 6vw, 4rem);
     color: var(--primary-color);
     margin-bottom: 1rem;
     font-weight: 700;
@@ -420,7 +426,7 @@ body {
 /* Secciones Generales */
 .section-title {
     font-family: 'Dancing Script', cursive;
-    font-size: 3rem;
+    font-size: clamp(2rem, 5vw, 3rem);
     color: var(--primary-color);
     text-align: center;
     margin-bottom: 1rem;
@@ -937,7 +943,7 @@ body {
     }
     
     .hero-title {
-        font-size: 3rem;
+    font-size: clamp(2.3rem, 8vw, 3rem);
     }
     
     .section-title {
@@ -973,11 +979,11 @@ body {
 
 @media (max-width: 480px) {
     .hero-title {
-        font-size: 2.5rem;
+    font-size: clamp(2rem, 9vw, 2.5rem);
     }
     
     .section-title {
-        font-size: 2rem;
+    font-size: clamp(1.7rem, 8vw, 2rem);
     }
     
     .container {
@@ -987,7 +993,42 @@ body {
     .cotizar-form {
         padding: 1.5rem;
     }
+
+    .sabor-img-ingredientes {
+        flex-direction: row;
+        gap: .75rem;
+    }
+    .sabor-img-placeholder { width:70px; height:85px; }
+    .sabor-card-pedido { padding: .85rem .85rem 1rem; }
+    .sabor-cantidad-row { transform: scale(.9); }
+    .sabor-cantidad-row button { width: 50px; }
+    .resumen-pedido { padding: .9rem 1rem; }
+    .resumen-pedido h3 { font-size: 1.3rem; }
+    .upsell-hint { font-size: .7rem; }
 }
+
+/* Barra CTA móvil */
+.mobile-cta-bar {
+    position: fixed;
+    left:0;right:0;bottom:0;
+    background:#ffffffee;
+    backdrop-filter: blur(6px);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:.75rem;
+    padding:.7rem .9rem;
+    box-shadow:0 -2px 10px rgba(0,0,0,.08);
+    border-top:1px solid #e3dede;
+    transform: translateY(110%);
+    transition: transform .35s ease;
+    z-index:999;
+    font-size:.85rem;
+}
+.mobile-cta-bar.visible { transform: translateY(0); }
+.mobile-cta-bar .m-total { font-weight:600; color: var(--text-dark); letter-spacing:.5px; }
+.mobile-cta-bar .m-btn { margin:0; flex:0 0 auto; padding:.65rem 1.1rem; font-size:.85rem; }
+@media (min-width: 769px) { .mobile-cta-bar { display:none; } }
 
 /* Animaciones */
 @keyframes fadeInUp {
@@ -1005,6 +1046,24 @@ body {
 .precio-card,
 .info-card {
     animation: fadeInUp 0.6s ease-out;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition: none !important; }
+    .sabor-cantidad-row .cantidad.bump { animation: none !important; }
+}
+
+/* Coarse pointer adjustments (mejor tacto) */
+@media (pointer: coarse) {
+    .sabor-cantidad-row button { min-height: 52px; }
+    .submit-button { padding: 16px 18px; }
+}
+
+/* Extra pequeño */
+@media (max-width: 360px) {
+    .sabor-cantidad-row { transform: scale(.85); }
+    .mobile-cta-bar { font-size: .78rem; }
 }
 
 /* Scroll suave */

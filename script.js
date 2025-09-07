@@ -134,11 +134,26 @@ function actualizarResumen() {
 
     // Botón
     const btnSolicitar = $('#btn-solicitar-pedido');
+    const mobileBar = $('#mobile-cta-bar');
+    const mobileTotal = $('#mobile-bar-total');
+    const mobileBtn = $('#btn-solicitar-mobile');
     if (btnSolicitar) {
         const habilitado = totalCantidad >= MINIMO_PEDIDO;
         btnSolicitar.disabled = !habilitado;
         btnSolicitar.setAttribute('aria-disabled', String(!habilitado));
         btnSolicitar.textContent = habilitado ? 'Solicitar pedido' : `Mínimo ${MINIMO_PEDIDO} unidades (${totalCantidad}/${MINIMO_PEDIDO})`;
+    }
+    if (mobileBar && mobileTotal && mobileBtn) {
+        mobileTotal.textContent = `${totalCantidad} uds · $${totalFinal.toLocaleString('es-CL')}`;
+        const habilitado = totalCantidad >= MINIMO_PEDIDO;
+        mobileBtn.disabled = !habilitado;
+        mobileBtn.setAttribute('aria-disabled', String(!habilitado));
+        mobileBar.classList.toggle('visible', totalCantidad > 0);
+        if (totalCantidad > 0) {
+            document.body.style.paddingBottom = '70px';
+        } else {
+            document.body.style.paddingBottom = '';
+        }
     }
 
     announce(`Total ${totalCantidad} unidades. Precio unitario ${precioUnitario}. Total ${totalFinal}`);
@@ -167,65 +182,61 @@ function configurarDelegacionCantidad() {
     });
 }
 
-function configurarBotonSolicitar() {
-    const btn = $('#btn-solicitar-pedido');
-    if (!btn) return;
-    btn.addEventListener('click', e => {
-        e.preventDefault();
-        const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
-        if (totalCantidad < MINIMO_PEDIDO) return; // botón ya deshabilita
-        const precioUnitario = getPrecioUnitario(totalCantidad);
-        const totalFinal = totalCantidad * precioUnitario;
-        const saboresSeleccionados = saboresData.filter(s => cantidades[s.key] > 0);
-        if (!saboresSeleccionados.length) return;
-
-        // Datos cliente
-        const nombre = $('#campo-nombre')?.value.trim();
-        const telefono = $('#campo-telefono')?.value.trim();
-        const fecha = $('#campo-fecha')?.value;
+function dispararSolicitud(e) {
+    if (e) e.preventDefault();
+    const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
+    if (totalCantidad < MINIMO_PEDIDO) return;
+    const precioUnitario = getPrecioUnitario(totalCantidad);
+    const totalFinal = totalCantidad * precioUnitario;
+    const saboresSeleccionados = saboresData.filter(s => cantidades[s.key] > 0);
+    if (!saboresSeleccionados.length) return;
+    const nombre = $('#campo-nombre')?.value.trim();
+    const telefono = $('#campo-telefono')?.value.trim();
+    const fecha = $('#campo-fecha')?.value;
     const comuna = $('#campo-comuna')?.value;
     const direccion = $('#campo-direccion')?.value.trim();
-        const comentarios = $('#campo-comentarios')?.value.trim();
-
-        // Validación básica
-        if (!nombre || !telefono || !fecha || !comuna || !direccion) {
-            alert('Por favor completa Nombre, Teléfono, Fecha, Comuna y Dirección.');
-            return;
-        }
-        if (!COMUNAS_PERMITIDAS.includes(comuna)) {
-            alert('Selecciona una comuna válida.');
-            return;
-        }
-        // Fecha mínima 4 días
-        const hoy = new Date();
-        const fechaMin = new Date();
-        fechaMin.setDate(hoy.getDate() + 4);
-        const fechaUser = new Date(fecha + 'T00:00:00');
-        if (fechaUser < fechaMin) {
-            alert('La fecha debe tener al menos 4 días de anticipación.');
-            return;
-        }
-
-        let body = 'Pedido de cotización:%0D%0A%0D%0A';
-        body += `Nombre: ${nombre}%0D%0A`;
-        body += `Teléfono: ${telefono}%0D%0A`;
-        body += `Fecha deseada: ${fecha}%0D%0A`;
+    const comentarios = $('#campo-comentarios')?.value.trim();
+    if (!nombre || !telefono || !fecha || !comuna || !direccion) {
+        alert('Por favor completa Nombre, Teléfono, Fecha, Comuna y Dirección.');
+        return;
+    }
+    if (!COMUNAS_PERMITIDAS.includes(comuna)) {
+        alert('Selecciona una comuna válida.');
+        return;
+    }
+    const hoy = new Date();
+    const fechaMin = new Date();
+    fechaMin.setDate(hoy.getDate() + 4);
+    const fechaUser = new Date(fecha + 'T00:00:00');
+    if (fechaUser < fechaMin) {
+        alert('La fecha debe tener al menos 4 días de anticipación.');
+        return;
+    }
+    let body = 'Pedido de cotización:%0D%0A%0D%0A';
+    body += `Nombre: ${nombre}%0D%0A`;
+    body += `Teléfono: ${telefono}%0D%0A`;
+    body += `Fecha deseada: ${fecha}%0D%0A`;
     body += `Comuna: ${comuna}%0D%0A`;
     body += `Dirección: ${direccion}%0D%0A`;
-        if (comentarios) body += `Comentarios: ${comentarios}%0D%0A`;
-        body += `%0D%0A`;
-        saboresSeleccionados.forEach(s => {
-            body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
-        });
-        body += `%0D%0ATotal unidades: ${totalCantidad}%0D%0A`;
-        body += `Precio unitario: $${precioUnitario.toLocaleString('es-CL')}%0D%0A`;
-        body += `Total: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
-        body += `%0D%0AOrigen: Sitio Web Delicias Florencia`;
-        const subject = `Cotización web (${totalCantidad} uds)`;
-        const mailtoUrl = `mailto:${EMAIL_DESTINO}?subject=${encodeURIComponent(subject)}&body=${body}`;
-        window.location.href = mailtoUrl;
-        mostrarMensajeExito();
+    if (comentarios) body += `Comentarios: ${comentarios}%0D%0A`;
+    body += `%0D%0A`;
+    saboresSeleccionados.forEach(s => {
+        body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
     });
+    body += `%0D%0ATotal unidades: ${totalCantidad}%0D%0A`;
+    body += `Precio unitario: $${precioUnitario.toLocaleString('es-CL')}%0D%0A`;
+    body += `Total: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
+    body += `%0D%0AOrigen: Sitio Web Delicias Florencia`;
+    const subject = `Cotización web (${totalCantidad} uds)`;
+    const mailtoUrl = `mailto:${EMAIL_DESTINO}?subject=${encodeURIComponent(subject)}&body=${body}`;
+    window.location.href = mailtoUrl;
+    mostrarMensajeExito();
+}
+
+function configurarBotonSolicitar() {
+    const btns = $$('button[data-action="solicitar"]');
+    if (!btns.length) return;
+    btns.forEach(b => b.addEventListener('click', dispararSolicitud));
 }
 
 
