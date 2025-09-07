@@ -301,6 +301,59 @@ function configurarAnimaciones() {
     elements.forEach(el => observer.observe(el));
 }
 
+// Mapa de cobertura (Leaflet + GeoJSON local)
+function configurarMapaCobertura() {
+    const mapEl = document.getElementById('coverage-map');
+    if (!mapEl || typeof L === 'undefined') return;
+    mapEl.classList.add('coverage-map-loading');
+    const centro = [-33.585, -70.67];
+    const map = L.map(mapEl, { scrollWheelZoom:false, attributionControl:true }).setView(centro, 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; OpenStreetMap' }).addTo(map);
+    fetch('comunas.geojson')
+        .then(r=>r.json())
+        .then(data => {
+            // Sin bordes internos: stroke desactivado
+            function style(){ return { weight:0, fillColor:'#E8B4B8', fillOpacity:.28, interactive:true }; }
+            function highlight(e){ e.target.setStyle({ fillOpacity:.42 }); }
+            function reset(e){ e.target.setStyle({ fillOpacity:.28 }); }
+            function onEach(f,l){ const nombre=f.properties?.NOMBRE||'Comuna'; l.bindPopup(`<strong>${nombre}</strong><br/>Cobertura disponible`); l.on({mouseover:highlight,mouseout:reset}); }
+            const geo = L.geoJSON(data, { style, onEachFeature:onEach }).addTo(map);
+            try { map.fitBounds(geo.getBounds(), { padding:[25,25] }); } catch(_){ }
+            Object.entries(COMUNAS_COORDS).forEach(([nombre,{lat,lng}]) => {
+                L.marker([lat,lng], { title:nombre }).addTo(map).bindTooltip(nombre, {direction:'top', offset:[0,-6]});
+            });
+            // Construir contorno externo (convex hull) para mostrar un solo borde
+            const allPoints = [];
+            geo.eachLayer(layer => {
+                const g = layer.feature && layer.feature.geometry;
+                if (!g) return;
+                if (g.type === 'Polygon') {
+                    g.coordinates[0].forEach(([lng,lat]) => allPoints.push([lng,lat]));
+                } else if (g.type === 'MultiPolygon') {
+                    g.coordinates.forEach(poly => poly[0].forEach(([lng,lat]) => allPoints.push([lng,lat])));
+                }
+            });
+            function convexHull(pts){
+                if (pts.length < 4) return pts.slice();
+                // ordenar por x luego y
+                const p = pts.slice().sort((a,b)=> a[0]===b[0]? a[1]-b[1] : a[0]-b[0]);
+                const cross = (o,a,b)=> (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0]);
+                const lower=[]; for (const pt of p){ while (lower.length>=2 && cross(lower[lower.length-2], lower[lower.length-1], pt) <=0) lower.pop(); lower.push(pt);} 
+                const upper=[]; for (let i=p.length-1;i>=0;i--){ const pt=p[i]; while (upper.length>=2 && cross(upper[upper.length-2], upper[upper.length-1], pt) <=0) upper.pop(); upper.push(pt);} 
+                upper.pop(); lower.pop(); return lower.concat(upper);
+            }
+            const hull = convexHull(allPoints);
+            if (hull.length) {
+                L.polygon(hull.map(([lng,lat])=>[lat,lng]), { color:'#7A9A7E', weight:2, fill:false, dashArray:'6 4', interactive:false }).addTo(map);
+            }
+        })
+        .catch(err => console.error('Error mapa cobertura', err))
+        .finally(()=>{
+            mapEl.classList.remove('coverage-map-loading');
+            const fb = mapEl.querySelector('.coverage-map-fallback'); if (fb) fb.remove();
+        });
+}
+
 
 // Inicialización principal
 document.addEventListener('DOMContentLoaded', () => {
@@ -310,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarBotonSolicitar();
     configurarScrollSuave();
     configurarAnimaciones();
+    configurarMapaCobertura();
     actualizarResumen();
     // establecer fecha mínima
     const inputFecha = $('#campo-fecha');
