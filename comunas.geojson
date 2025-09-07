@@ -4,7 +4,7 @@
     {
       "type": "Feature",
       "properties": {
-        "NOMBRE": "Cobertura"
+        "NOMBRE": "San Bernardo"
       },
       "geometry": {
         "type": "Polygon",
