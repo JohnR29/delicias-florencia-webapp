@@ -33,57 +33,15 @@ function getPrecioUnitario(total) {
 // Accesibilidad: actualización discreta de estado
 function announce(msg) {
     const live = $('#live-updates');
-    if (live) {
-        live.textContent = msg;
-    }
+    if (live) live.textContent = msg;
 }
 
 // ==========================
-// Datos (centralizado)
-// ==========================
-const saboresData = Object.freeze([
-    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'] },
-    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'] },
-    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'] },
-    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'] }
-]);
-
-const cantidades = Object.fromEntries(saboresData.map(s => [s.key, 0]));
-
-// ==========================
-// Render dinámico tarjetas pedido
-// ==========================
-function renderSaboresPedido() {
-    const cont = document.getElementById('sabores-pedido');
-    if (!cont) return;
-    cont.innerHTML = saboresData.map(s => {
-        const ingredientes = s.ingredientes.map(i => `<li>${i}</li>`).join('');
-        return `
-        <div class="sabor-card-pedido" data-sabor="${s.key}">
-            <h3>${s.nombre}</h3>
-            <div class="sabor-img-ingredientes">
-                <div class="sabor-img-placeholder" aria-hidden="true"></div>
-                <div class="sabor-ingredientes">
-                    <strong>Ingredientes:</strong>
-                    <ul>${ingredientes}</ul>
-                </div>
-            </div>
-            <div class="sabor-cantidad-row">
-                <button type="button" class="menos-btn" aria-label="Restar ${s.nombre}">-</button>
-                <span class="cantidad" aria-live="off">0</span>
-                <button type="button" class="mas-btn" aria-label="Sumar ${s.nombre}">+</button>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-// ==========================
-// Render y estado carrito
+// Render y estado carrito (restaurado)
 // ==========================
 function actualizarResumen() {
     const cards = $$('.sabor-card-pedido');
     let totalCantidad = 0;
-
     cards.forEach(card => {
         const key = card.getAttribute('data-sabor');
         const cantidadSpan = card.querySelector('.cantidad');
@@ -91,10 +49,9 @@ function actualizarResumen() {
         const val = cantidades[key] || 0;
         if (cantidadSpan) cantidadSpan.textContent = val;
         if (menosBtn) menosBtn.disabled = val === 0;
-        // Animación bump
         if (cantidadSpan) {
             cantidadSpan.classList.remove('bump');
-            void cantidadSpan.offsetWidth; // reflow para reiniciar animación
+            void cantidadSpan.offsetWidth;
             cantidadSpan.classList.add('bump');
         }
         totalCantidad += val;
@@ -112,7 +69,6 @@ function actualizarResumen() {
         });
     }
 
-    // Totales
     const precioUnitario = getPrecioUnitario(totalCantidad);
     const totalFinal = totalCantidad * precioUnitario;
     const resumenPrecioUnitario = $('#resumen-precio-unitario');
@@ -139,7 +95,6 @@ function actualizarResumen() {
         upsellHint.textContent = msg;
     }
 
-    // Botón
     const btnSolicitar = $('#btn-solicitar-pedido');
     const mobileBar = $('#mobile-cta-bar');
     const mobileTotal = $('#mobile-bar-total');
@@ -156,11 +111,7 @@ function actualizarResumen() {
         mobileBtn.disabled = !habilitado;
         mobileBtn.setAttribute('aria-disabled', String(!habilitado));
         mobileBar.classList.toggle('visible', totalCantidad > 0);
-        if (totalCantidad > 0) {
-            document.body.style.paddingBottom = '70px';
-        } else {
-            document.body.style.paddingBottom = '';
-        }
+        document.body.style.paddingBottom = totalCantidad > 0 ? '70px' : '';
     }
 
     announce(`Total ${totalCantidad} unidades. Precio unitario ${precioUnitario}. Total ${totalFinal}`);
