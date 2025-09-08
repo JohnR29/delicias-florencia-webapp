@@ -1,15 +1,15 @@
 // ==========================
-// Constantes de configuración
+// Constantes de configuración mayorista
 // ==========================
-const MINIMO_PEDIDO = 6; // Pedido mínimo
-// Nuevos tramos de precios escalonados
-const UMBRAL_TIER2 = 15; // desde 15
-const UMBRAL_TIER3 = 20; // desde 20
-const PRECIO_TIER1 = 1700; // 6 - 14
-const PRECIO_TIER2 = 1600; // 15 - 19
-const PRECIO_TIER3 = 1500; // 20+
-const EMAIL_DESTINO = 'johnrojas297@gmail.com'; // TODO: parametrizar
-const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna', 'Zona de cobertura']);
+const MINIMO_PEDIDO = 24; // Pedido mínimo mayorista (2 docenas)
+// Nuevos tramos de precios mayoristas
+const UMBRAL_TIER2 = 48; // desde 48 (4 docenas)
+const UMBRAL_TIER3 = 72; // desde 72 (6 docenas)
+const PRECIO_TIER1 = 1200; // 24 - 47 unidades
+const PRECIO_TIER2 = 1100; // 48 - 71 unidades  
+const PRECIO_TIER3 = 1000; // 72+ unidades
+const EMAIL_DESTINO = 'ventas@deliciasflorencia.cl'; // Email comercial
+const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna', 'Zona de distribución']);
 // Coordenadas aproximadas de comunas (centroides simplificados)
 const COMUNAS_COORDS = Object.freeze({
     'San Bernardo': { lat: -33.606246, lng: -70.700462 },
@@ -120,23 +120,21 @@ function actualizarResumen() {
     if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
     if (resumenTotal) resumenTotal.textContent = `$${totalFinal.toLocaleString('es-CL')}`;
 
-    if (upsellHint) {
+        if (upsellHint) {
         let msg = '';
         if (totalCantidad >= MINIMO_PEDIDO && totalCantidad < UMBRAL_TIER2) {
             const faltan = UMBRAL_TIER2 - totalCantidad;
-            msg = `Agrega ${faltan} unidad${faltan===1?'':'es'} más y baja a $${PRECIO_TIER2.toLocaleString('es-CL')} c/u.`;
+            msg = `Agrega ${faltan} unidad${faltan===1?'':'es'} más y baja a $${PRECIO_TIER2.toLocaleString('es-CL')} c/u (precio mayorista 2).`;
         } else if (totalCantidad >= UMBRAL_TIER2 && totalCantidad < UMBRAL_TIER3) {
             const faltan = UMBRAL_TIER3 - totalCantidad;
-            msg = `Con ${faltan} unidad${faltan===1?'':'es'} más alcanzas $${PRECIO_TIER3.toLocaleString('es-CL')} c/u (mejor precio).`;
+            msg = `Con ${faltan} unidad${faltan===1?'':'es'} más alcanzas $${PRECIO_TIER3.toLocaleString('es-CL')} c/u (mejor precio mayorista).`;
         } else if (totalCantidad >= UMBRAL_TIER3) {
-            msg = `Tienes el mejor precio ($${PRECIO_TIER3.toLocaleString('es-CL')} c/u).`;
+            msg = `Tienes el mejor precio mayorista ($${PRECIO_TIER3.toLocaleString('es-CL')} c/u).`;
         } else {
-            msg = `Mínimo ${MINIMO_PEDIDO} unidades para cotizar.`;
+            msg = `Mínimo ${MINIMO_PEDIDO} unidades para distribución mayorista.`;
         }
         upsellHint.textContent = msg;
-    }
-
-    const btnSolicitar = $('#btn-solicitar-pedido');
+    }    const btnSolicitar = $('#btn-solicitar-pedido');
     const mobileBar = $('#mobile-cta-bar');
     const mobileTotal = $('#mobile-bar-total');
     const mobileBtn = $('#btn-solicitar-mobile');
@@ -144,7 +142,7 @@ function actualizarResumen() {
         const habilitado = totalCantidad >= MINIMO_PEDIDO;
         btnSolicitar.disabled = !habilitado;
         btnSolicitar.setAttribute('aria-disabled', String(!habilitado));
-        btnSolicitar.textContent = habilitado ? 'Solicitar pedido' : `Mínimo ${MINIMO_PEDIDO} unidades (${totalCantidad}/${MINIMO_PEDIDO})`;
+        btnSolicitar.textContent = habilitado ? 'Enviar Solicitud Comercial' : `Mínimo ${MINIMO_PEDIDO} unidades (${totalCantidad}/${MINIMO_PEDIDO})`;
     }
     if (mobileBar && mobileTotal && mobileBtn) {
         mobileTotal.textContent = `${totalCantidad} uds · $${totalFinal.toLocaleString('es-CL')}`;
@@ -189,44 +187,45 @@ function dispararSolicitud(e) {
     const totalFinal = totalCantidad * precioUnitario;
     const saboresSeleccionados = saboresData.filter(s => cantidades[s.key] > 0);
     if (!saboresSeleccionados.length) return;
-    const nombre = $('#campo-nombre')?.value.trim();
+    
+    const negocio = $('#campo-nombre')?.value.trim();
+    const contacto = $('#campo-contacto')?.value.trim();
     const telefono = $('#campo-telefono')?.value.trim();
-    const fecha = $('#campo-fecha')?.value;
+    const email = $('#campo-email')?.value.trim();
+    const tipo = $('#campo-tipo')?.value;
     const comuna = $('#campo-comuna')?.value;
     const direccion = $('#campo-direccion')?.value.trim();
     const comentarios = $('#campo-comentarios')?.value.trim();
-    if (!nombre || !telefono || !fecha || !comuna || !direccion) {
-        alert('Por favor completa Nombre, Teléfono, Fecha, Comuna y Dirección.');
+    
+    if (!negocio || !contacto || !telefono || !email || !tipo || !comuna || !direccion) {
+        alert('Por favor completa todos los campos obligatorios.');
         return;
     }
+    
     if (!COMUNAS_PERMITIDAS.includes(comuna)) {
-        alert('Selecciona una comuna válida.');
+        alert('Selecciona una comuna dentro de nuestras rutas de distribución.');
         return;
     }
-    const hoy = new Date();
-    const fechaMin = new Date();
-    fechaMin.setDate(hoy.getDate() + 4);
-    const fechaUser = new Date(fecha + 'T00:00:00');
-    if (fechaUser < fechaMin) {
-        alert('La fecha debe tener al menos 4 días de anticipación.');
-        return;
-    }
-    let body = 'Pedido de cotización:%0D%0A%0D%0A';
-    body += `Nombre: ${nombre}%0D%0A`;
+    
+    let body = 'Solicitud de catálogo comercial:%0D%0A%0D%0A';
+    body += `Negocio: ${negocio}%0D%0A`;
+    body += `Contacto: ${contacto}%0D%0A`;
     body += `Teléfono: ${telefono}%0D%0A`;
-    body += `Fecha deseada: ${fecha}%0D%0A`;
+    body += `Email: ${email}%0D%0A`;
+    body += `Tipo de negocio: ${tipo}%0D%0A`;
     body += `Comuna: ${comuna}%0D%0A`;
     body += `Dirección: ${direccion}%0D%0A`;
-    if (comentarios) body += `Comentarios: ${comentarios}%0D%0A`;
-    body += `%0D%0A`;
+    if (comentarios) body += `Volumen estimado: ${comentarios}%0D%0A`;
+    body += `%0D%0A--- PRODUCTOS DE INTERÉS ---%0D%0A`;
     saboresSeleccionados.forEach(s => {
         body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
     });
-    body += `%0D%0ATotal unidades: ${totalCantidad}%0D%0A`;
-    body += `Precio unitario: $${precioUnitario.toLocaleString('es-CL')}%0D%0A`;
-    body += `Total: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
-    body += `%0D%0AOrigen: Sitio Web Delicias Florencia`;
-    const subject = `Cotización web ${nombre} (${totalCantidad} uds)`;
+    body += `%0D%0ATotal estimado: ${totalCantidad} unidades%0D%0A`;
+    body += `Precio mayorista: $${precioUnitario.toLocaleString('es-CL')} c/u%0D%0A`;
+    body += `Valor referencial: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
+    body += `%0D%0AOrigen: Sitio Web Distribución - Delicias Florencia`;
+    
+    const subject = `Solicitud comercial ${negocio} - ${tipo} (${totalCantidad} uds)`;
     const mailtoUrl = `mailto:${EMAIL_DESTINO}?subject=${encodeURIComponent(subject)}&body=${body}`;
     window.location.href = mailtoUrl;
     mostrarMensajeExito();
@@ -242,7 +241,7 @@ function configurarBotonSolicitar() {
 function mostrarMensajeExito() {
     const mensaje = document.createElement('div');
     mensaje.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--secondary-color);color:#fff;padding:1.5rem 2rem;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.3);z-index:10000;font-weight:600;text-align:center;`;
-    mensaje.innerHTML = '<i class="fas fa-check-circle" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>¡Solicitud preparada!<br><small>Abriendo correo…</small>';
+    mensaje.innerHTML = '<i class="fas fa-check-circle" style="font-size:2rem;display:block;margin-bottom:.5rem"></i>¡Solicitud comercial enviada!<br><small>Abriendo correo…</small>';
     document.body.appendChild(mensaje);
     setTimeout(() => mensaje.remove(), 3000);
 }
@@ -382,22 +381,25 @@ function renderPreciosTramos() {
     try { cont.setAttribute('data-status','generating'); } catch {}
     const tramos = [
         {
-            titulo:'Tramo 1',
+            titulo:'Tramo 1 - Inicial',
             rango:`${MINIMO_PEDIDO} - ${UMBRAL_TIER2 - 1} uds`,
             precio:PRECIO_TIER1,
-            ahorro:null
+            ahorro:null,
+            descripcion: '2-4 docenas'
         },
         {
-            titulo:'Tramo 2',
+            titulo:'Tramo 2 - Frecuente', 
             rango:`${UMBRAL_TIER2} - ${UMBRAL_TIER3 - 1} uds`,
             precio:PRECIO_TIER2,
-            ahorro: PRECIO_TIER1 - PRECIO_TIER2
+            ahorro: PRECIO_TIER1 - PRECIO_TIER2,
+            descripcion: '4-6 docenas'
         },
         {
-            titulo:'Tramo 3',
+            titulo:'Tramo 3 - Mayorista',
             rango:`${UMBRAL_TIER3}+ uds`,
             precio:PRECIO_TIER3,
-            ahorro: PRECIO_TIER2 - PRECIO_TIER3
+            ahorro: PRECIO_TIER2 - PRECIO_TIER3,
+            descripcion: '6+ docenas'
         }
     ];
     const menorPrecio = Math.min(...tramos.map(t=>t.precio));
@@ -415,8 +417,9 @@ function renderPreciosTramos() {
             <div class="pt-monto" aria-hidden="true">$${t.precio.toLocaleString('es-CL')}</div>
             <div class="pt-unit">c/u</div>
             <div class="pt-rango">${t.rango}</div>
+            <div class="pt-descripcion">${t.descripcion}</div>
             <div class="pt-ahorro">${ahorroTxt}</div>
-            <button class="pt-cta" data-ir-cotizar="true" aria-label="Usar ${t.titulo} para cotizar">Cotizar</button>
+            <button class="pt-cta" data-ir-cotizar="true" aria-label="Cotizar ${t.titulo}">Ver Catálogo</button>
         </article>`;
     }).join('');
     try { cont.setAttribute('data-status','ready'); } catch {}
@@ -432,7 +435,7 @@ function renderPreciosTramos() {
         if (destino) destino.scrollIntoView({behavior:'smooth'});
     });
     const nota = document.getElementById('nota-minimo');
-    if (nota) nota.textContent = `Pedido mínimo ${MINIMO_PEDIDO} unidades. Puedes combinar sabores.`;
+    if (nota) nota.textContent = `Pedido mínimo para distribución: ${MINIMO_PEDIDO} unidades. Puedes combinar sabores.`;
 }
 
 
@@ -455,16 +458,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 300);
     actualizarResumen();
-    // establecer fecha mínima
-    const inputFecha = $('#campo-fecha');
-    if (inputFecha) {
-        const base = new Date();
-        base.setDate(base.getDate() + 4);
-        const y = base.getFullYear();
-        const m = String(base.getMonth() + 1).padStart(2, '0');
-        const d = String(base.getDate()).padStart(2, '0');
-        inputFecha.min = `${y}-${m}-${d}`;
-    }
 });
 
 // (Opcional) Parallax deshabilitado para evitar mareo / rendimiento; si se quiere, habilitar con prefers-reduced-motion check.

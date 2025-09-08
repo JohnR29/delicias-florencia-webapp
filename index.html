@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Delicias Florencia: tortas caseras en vaso artesanales. Sabores, precios por cantidad y entrega a domicilio en la Región Metropolitana.">
-    <title>Delicias Florencia - Tortas Caseras en Vaso</title>
+    <meta name="description" content="Delicias Florencia: tortas caseras en vaso para almacenes, minimarkets y pastelerías. Volúmenes mayoristas, entrega programada en la Región Metropolitana.">
+    <title>Delicias Florencia - Distribución Mayorista de Tortas en Vaso</title>
     <link rel="stylesheet" href="styles.css">
     <!-- Leaflet CSS para mapa real -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -21,10 +21,10 @@
                 </div>
                 <ul class="nav-menu" id="primary-navigation">
                     <li><a href="#inicio" class="nav-link">Inicio</a></li>
-                    <li><a href="#sabores" class="nav-link">Sabores</a></li>
-                    <li><a href="#precios" class="nav-link">Precios</a></li>
-                    <li><a href="#cobertura" class="nav-link">Cobertura</a></li>
-                    <li><a href="#cotizar" class="nav-link">Cotizar</a></li>
+                    <li><a href="#sabores" class="nav-link">Productos</a></li>
+                    <li><a href="#precios" class="nav-link">Precios Mayorista</a></li>
+                    <li><a href="#cobertura" class="nav-link">Distribución</a></li>
+                    <li><a href="#cotizar" class="nav-link">Solicitar Catálogo</a></li>
                 </ul>
                 <button type="button" class="hamburger" aria-label="Abrir menú" aria-expanded="false" aria-controls="primary-navigation">
                     <span class="bar" aria-hidden="true"></span>
@@ -42,9 +42,9 @@
             <div class="banner-overlay">
                 <div class="banner-content">
                     <h1 class="banner-title">Delicias Florencia</h1>
-                    <p class="banner-subtitle">Tortas caseras en vaso, hechas con amor</p>
-                    <p class="banner-description">Disfruta de nuestras deliciosas tortas artesanales en una presentación única y elegante</p>
-                    <a href="#cotizar" class="cta-button">Cotizar Ahora</a>
+                    <p class="banner-subtitle">Distribución mayorista de tortas caseras en vaso</p>
+                    <p class="banner-description">Productos artesanales para almacenes, minimarkets y pastelerías con entrega programada</p>
+                    <a href="#cotizar" class="cta-button">Solicitar Catálogo</a>
                 </div>
             </div>
         </div>
@@ -53,16 +53,16 @@
     <!-- Hero Section -->
     <section id="inicio" class="hero">
         <div class="hero-content">
-            <h2 class="section-title">Bienvenidos a Delicias Florencia</h2>
-            <p class="section-subtitle">La perfecta combinación entre tradición y sabor en cada vaso</p>
+            <h2 class="section-title">Tu Socio Comercial en Repostería</h2>
+            <p class="section-subtitle">Amplia tu oferta con nuestras tortas artesanales de alta rotación y excelente margen</p>
         </div>
     </section>
 
     <!-- Sabores Section -->
     <section id="sabores" class="sabores">
         <div class="container">
-            <h2 class="section-title">Nuestros Sabores</h2>
-            <p class="section-subtitle">Cada torta es preparada con ingredientes frescos y el mejor cariño</p>
+            <h2 class="section-title">Nuestra Línea de Productos</h2>
+            <p class="section-subtitle">Tortas premium con presentación única que atraen a tus clientes</p>
             
             <div class="sabores-grid">
                 <div class="sabor-card">
@@ -71,7 +71,7 @@
                     </div>
                     <div class="sabor-content">
                         <h3>Tres Leches</h3>
-                        <p>Deliciosa torta empapada en tres tipos de leche, coronada con crema chantilly</p>
+                        <p>Deliciosa torta empapada en tres tipos de leche, coronada con crema chantilly. <strong>Alto margen y rotación</strong></p>
                     </div>
                 </div>
 
@@ -81,7 +81,7 @@
                     </div>
                     <div class="sabor-content">
                         <h3>Selva Negra</h3>
-                        <p>Bizcocho de chocolate con cerezas, crema chantilly y virutas de chocolate</p>
+                        <p>Bizcocho de chocolate con cerezas, crema chantilly y virutas de chocolate. <strong>Sabor premium</strong></p>
                     </div>
                 </div>
 
@@ -91,7 +91,7 @@
                     </div>
                     <div class="sabor-content">
                         <h3>Oreo</h3>
-                        <p>Irresistible combinación de galletas Oreo con crema y capas de chocolate</p>
+                        <p>Irresistible combinación de galletas Oreo con crema y capas de chocolate. <strong>Favorito de niños y jóvenes</strong></p>
                     </div>
                 </div>
                 <div class="sabor-card">
@@ -100,14 +100,14 @@
                     </div>
                     <div class="sabor-content">
                         <h3>Piña Crema</h3>
-                        <p>Deliciosa torta de bizcocho blanco, piña, crema y manjar.</p>
+                        <p>Deliciosa torta de bizcocho blanco, piña, crema y manjar. <strong>Sabor tropical popular</strong></p>
                     </div>
                 </div>
             </div>
 
             <div class="sabores-note">
                 <i class="fas fa-info-circle"></i>
-                <p>¡Próximamente agregaremos más sabores deliciosos!</p>
+                <p>Contamos con capacidad para volúmenes grandes y entregas programadas</p>
             </div>
         </div>
     </section>
@@ -115,18 +115,18 @@
     <!-- Precios Section -->
     <section id="precios" class="precios">
         <div class="container">
-            <h2 class="section-title">Precios</h2>
-            <div id="precios-cards" class="precios-cards" aria-label="Tramos de precios" data-dynamic="true"></div>
-            <p class="social-proof-precios" id="social-proof-precios" aria-live="polite">Más del 60% elige 20+ unidades</p>
-            <p class="nota-minimo" id="nota-minimo">Pedido mínimo 6 unidades.</p>
+            <h2 class="section-title">Precios Mayoristas</h2>
+            <div id="precios-cards" class="precios-cards" aria-label="Tramos de precios mayoristas" data-dynamic="true"></div>
+            <p class="social-proof-precios" id="social-proof-precios" aria-live="polite">Más del 80% de nuestros socios eligen pedidos de 50+ unidades</p>
+            <p class="nota-minimo" id="nota-minimo">Pedido mínimo para distribución: 24 unidades.</p>
         </div>
     </section>
 
     <!-- Cobertura Section -->
     <section id="cobertura" class="cobertura">
         <div class="container">
-            <h2 class="section-title">Zonas de Cobertura</h2>
-            <p class="section-subtitle">Entregamos en las siguientes comunas de la Región Metropolitana</p>
+            <h2 class="section-title">Zonas de Distribución</h2>
+            <p class="section-subtitle">Rutas de entrega programadas para tu negocio</p>
             
             <div class="cobertura-content">
                 <div class="cobertura-map">
@@ -138,22 +138,22 @@
                     </div>
                 </div>
                 <div class="cobertura-list">
-                    <h3>Comunas que atendemos:</h3>
+                    <h3>Comunas con entrega programada:</h3>
                     <div class="comunas-grid">
                         <div class="comuna-item">
-                            <i class="fas fa-map-pin"></i>
+                            <i class="fas fa-truck"></i>
                             <span>San Bernardo</span>
                         </div>
                         <div class="comuna-item">
-                            <i class="fas fa-map-pin"></i>
+                            <i class="fas fa-truck"></i>
                             <span>La Pintana</span>
                         </div>
                         <div class="comuna-item">
-                            <i class="fas fa-map-pin"></i>
+                            <i class="fas fa-truck"></i>
                             <span>El Bosque</span>
                         </div>
                         <div class="comuna-item">
-                            <i class="fas fa-map-pin"></i>
+                            <i class="fas fa-truck"></i>
                             <span>La Cisterna</span>
                         </div>
                     </div>
@@ -162,9 +162,9 @@
 
             <div class="entrega-info">
                 <div class="entrega-card">
-                    <i class="fas fa-truck"></i>
-                    <h4>Entrega a Domicilio</h4>
-                    <p>Llevamos tus tortas directamente a tu puerta</p>
+                    <i class="fas fa-calendar-alt"></i>
+                    <h4>Entregas Programadas</h4>
+                    <p>Rutas establecidas 3 veces por semana para garantizar producto fresco</p>
                 </div>
             </div>
         </div>
@@ -174,19 +174,34 @@
     <section id="cotizar" class="cotizar cotizar-grid">
     <div class="sabores-cards" id="sabores-pedido" data-dinamico="true"><!-- Tarjetas generadas dinámicamente --></div>
         <div class="resumen-pedido">
-            <h3>Resumen</h3>
+            <h3>Solicitar Catálogo Comercial</h3>
             <form id="form-datos-cliente" novalidate style="display:flex;flex-direction:column;gap:.6rem;margin-bottom:1rem;">
                 <div class="resumen-form-group">
-                    <label for="campo-nombre">Nombre <span aria-hidden="true" style="color:#c33">*</span></label>
-                    <input id="campo-nombre" name="nombre" type="text" autocomplete="name" required placeholder="Tu nombre" />
+                    <label for="campo-nombre">Nombre del negocio <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-nombre" name="nombre" type="text" autocomplete="organization" required placeholder="Ej: Almacén Los Robles" />
                 </div>
                 <div class="resumen-form-group">
-                    <label for="campo-telefono">Teléfono / WhatsApp <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <label for="campo-contacto">Persona de contacto <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-contacto" name="contacto" type="text" autocomplete="name" required placeholder="Nombre del encargado" />
+                </div>
+                <div class="resumen-form-group">
+                    <label for="campo-telefono">Teléfono comercial <span aria-hidden="true" style="color:#c33">*</span></label>
                     <input id="campo-telefono" name="telefono" type="tel" inputmode="tel" required placeholder="+56 9 ..." />
                 </div>
                 <div class="resumen-form-group">
-                    <label for="campo-fecha">Fecha deseada (mín. 4 días) <span aria-hidden="true" style="color:#c33">*</span></label>
-                    <input id="campo-fecha" name="fecha" type="date" required />
+                    <label for="campo-email">Email comercial <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-email" name="email" type="email" required placeholder="contacto@tualmacen.cl" />
+                </div>
+                <div class="resumen-form-group">
+                    <label for="campo-tipo">Tipo de negocio <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <select id="campo-tipo" name="tipo" required>
+                        <option value="" disabled selected>Selecciona...</option>
+                        <option value="Almacén">Almacén</option>
+                        <option value="Minimarket">Minimarket</option>
+                        <option value="Pastelería">Pastelería</option>
+                        <option value="Cafetería">Cafetería</option>
+                        <option value="Otro">Otro</option>
+                    </select>
                 </div>
                 <div class="resumen-form-group">
                     <label for="campo-comuna">Comuna <span aria-hidden="true" style="color:#c33">*</span></label>
@@ -197,15 +212,15 @@
                         <option value="El Bosque">El Bosque</option>
                         <option value="La Cisterna">La Cisterna</option>
                     </select>
-                    <small class="hint-comuna">Solo entregamos en estas comunas</small>
+                    <small class="hint-comuna">Rutas de distribución disponibles</small>
                 </div>
                 <div class="resumen-form-group">
-                    <label for="campo-direccion">Dirección completa <span aria-hidden="true" style="color:#c33">*</span></label>
-                    <input id="campo-direccion" name="direccion" type="text" required placeholder="Calle, número, depto, villa..." />
+                    <label for="campo-direccion">Dirección del negocio <span aria-hidden="true" style="color:#c33">*</span></label>
+                    <input id="campo-direccion" name="direccion" type="text" required placeholder="Dirección completa del local" />
                 </div>
                 <div class="resumen-form-group">
-                    <label for="campo-comentarios">Comentarios</label>
-                    <textarea id="campo-comentarios" name="comentarios" rows="2" placeholder="Detalles, horario, etc."></textarea>
+                    <label for="campo-comentarios">Volumen estimado mensual</label>
+                    <textarea id="campo-comentarios" name="comentarios" rows="2" placeholder="Ej: 200 unidades/mes, días preferidos de entrega, etc."></textarea>
                 </div>
             </form>
             <ul id="resumen-lista"></ul>
@@ -216,7 +231,7 @@
                 <span id="resumen-total">$0</span>
             </div>
             <div id="upsell-hint" class="upsell-hint" aria-live="polite"></div>
-            <button id="btn-solicitar-pedido" data-action="solicitar" class="submit-button" style="margin-top:1rem;" aria-disabled="true">Solicitar pedido</button>
+            <button id="btn-solicitar-pedido" data-action="solicitar" class="submit-button" style="margin-top:1rem;" aria-disabled="true">Enviar Solicitud Comercial</button>
             <div id="live-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
         </div>
     </section>
@@ -224,7 +239,7 @@
     <!-- Barra móvil de acción rápida -->
     <div id="mobile-cta-bar" class="mobile-cta-bar" aria-hidden="true">
         <div class="m-total" id="mobile-bar-total">0 uds · $0</div>
-        <button type="button" id="btn-solicitar-mobile" data-action="solicitar" class="submit-button m-btn" disabled aria-disabled="true" aria-label="Solicitar pedido desde barra móvil">Solicitar</button>
+        <button type="button" id="btn-solicitar-mobile" data-action="solicitar" class="submit-button m-btn" disabled aria-disabled="true" aria-label="Enviar solicitud comercial desde barra móvil">Solicitar</button>
     </div>
 
     <!-- Footer -->
@@ -233,19 +248,20 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <img src="logo-delicias-florencia.png" alt="Delicias Florencia" class="footer-logo">
-                    <p>Tortas caseras en vaso hechas con amor y los mejores ingredientes</p>
+                    <p>Distribuidor mayorista de tortas artesanales en vaso para el canal tradicional</p>
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Contacto</h4>
-                    <p><i class="fas fa-envelope"></i> deliciasflorencia@email.com</p>
+                    <h4>Contacto Comercial</h4>
+                    <p><i class="fas fa-envelope"></i> ventas@deliciasflorencia.cl</p>
+                    <p><i class="fas fa-phone"></i> +56 9 XXXX XXXX</p>
                     <p><i class="fas fa-map-marker-alt"></i> Región Metropolitana</p>
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Horarios</h4>
-                    <p>Pedidos mínimo 4 días de anticipación</p>
-                    <p>Respuesta en menos de 24 horas</p>
+                    <h4>Entregas</h4>
+                    <p>Rutas programadas: Martes, Jueves y Sábado</p>
+                    <p>Pedidos con 48 horas de anticipación</p>
                 </div>
             </div>
             
