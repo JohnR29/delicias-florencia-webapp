@@ -60,6 +60,51 @@
     margin: 0.5rem 0 0 0;
     padding-left: 1.2rem;
 }
+
+/* Controles de formato optimizados */
+.formatos-controles {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.formato-control {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 140px;
+}
+
+.formato-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.formato-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.formato-control[data-formato="9oz"] .formato-label {
+    color: var(--secondary-color);
+}
+
+.formato-precio {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-light);
+    font-family: 'Poppins', sans-serif;
+}
+
 .sabor-cantidad-row {
     --stepper-border: #d7c9cb;
     --stepper-bg: #fff;
@@ -72,19 +117,17 @@
     border: 2px solid var(--stepper-border);
     border-radius: 50px;
     overflow: hidden;
-    min-width: 180px;
+    min-width: 140px;
     position: relative;
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    margin-left: auto;
-    margin-right: auto;
 }
 .sabor-cantidad-row button {
     appearance: none;
     border: none;
     background: #ffffffcc;
     padding: 0;
-    width: 56px;
-    font-size: 1.4rem;
+    width: 40px;
+    font-size: 1.2rem;
     font-weight: 700;
     cursor: pointer;
     display: flex;
@@ -606,16 +649,17 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     margin: 2.2rem auto 1.6rem;
     max-width: 980px;
 }
+/* Estilos de tarjetas de precios antiguas - comentados
 .precio-tramo {
-    --highlight-scale: 1.06;
+    --highlight-scale: 1.04;
     position: relative;
     background: var(--white);
-    border-radius: 20px;
-    padding: 1.4rem 1.3rem 1.6rem;
-    border: 2.5px solid #f1e4e4;
-    box-shadow: 0 6px 22px -8px rgba(0,0,0,.12);
-    display:flex; flex-direction:column; align-items:center; text-align:center; gap:.6rem;
-    transition:.35s;
+    border-radius: 16px;
+    padding: 1rem 1rem 1.2rem;
+    border: 2px solid #f1e4e4;
+    box-shadow: 0 4px 16px -6px rgba(0,0,0,.1);
+    display:flex; flex-direction:column; align-items:center; text-align:center; gap:.4rem;
+    transition:.3s;
 }
 .precio-tramo:hover { transform: translateY(-6px); box-shadow:0 12px 32px -10px rgba(0,0,0,.18); }
 .precio-tramo[data-best="true"] {
@@ -627,24 +671,191 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
 .precio-tramo[data-best="true"] .pt-monto { color: #4d7f54; }
 .precio-tramo-badge {
     position:absolute;
-    top:-10px; left:50%; transform:translateX(-50%);
+    top:-8px; left:50%; transform:translateX(-50%);
     background: var(--secondary-color);
-    color:#fff; padding:.35rem .95rem .4rem; border-radius:40px; font-size:.62rem; letter-spacing:.7px; font-weight:600; text-transform:uppercase; box-shadow:0 4px 12px -3px rgba(0,0,0,.35);
+    color:#fff; padding:.25rem .7rem .3rem; border-radius:30px; font-size:.55rem; letter-spacing:.6px; font-weight:600; text-transform:uppercase; box-shadow:0 3px 10px -2px rgba(0,0,0,.3);
 }
-.pt-titulo { font-size:.8rem; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color: var(--text-light); }
-.pt-monto { font-size: clamp(2.1rem,5.2vw,2.6rem); font-weight:700; font-family:'Poppins',sans-serif; line-height:1; color: var(--primary-color); }
-.pt-unit { font-size:.65rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color: var(--text-light); }
-.pt-rango { font-size:.75rem; font-weight:500; letter-spacing:.4px; color: var(--text-dark); }
-.pt-descripcion { font-size:.65rem; color: var(--text-light); font-style: italic; margin-top: .2rem; }
-.pt-ahorro { font-size:.65rem; color:#6a8c6d; letter-spacing:.5px; font-weight:600; text-transform:uppercase; min-height:1.2em; }
+.pt-titulo { font-size:.75rem; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color: var(--text-light); }
+.pt-monto { font-size: clamp(1.8rem,4.5vw,2.2rem); font-weight:700; font-family:'Poppins',sans-serif; line-height:1; color: var(--primary-color); }
+.pt-unit { font-size:.6rem; font-weight:600; letter-spacing:.4px; text-transform:uppercase; color: var(--text-light); }
+.pt-rango { font-size:.7rem; font-weight:500; letter-spacing:.3px; color: var(--text-dark); }
+.pt-descripcion { font-size:.6rem; color: var(--text-light); font-style: italic; margin-top: .15rem; }
+.pt-ahorro { font-size:.6rem; color:#6a8c6d; letter-spacing:.4px; font-weight:600; text-transform:uppercase; min-height:1em; }
 .pt-ahorro strong { color:#4d7f54; }
-.pt-cta { margin-top:.4rem; font-size:.7rem; letter-spacing:.6px; font-weight:600; text-transform:uppercase; background: linear-gradient(45deg,var(--secondary-color), var(--primary-color)); color:#fff; padding:.55rem 1.1rem; border:none; border-radius:40px; cursor:pointer; transition:.3s; }
+.pt-cta { margin-top:.3rem; font-size:.65rem; letter-spacing:.5px; font-weight:600; text-transform:uppercase; background: linear-gradient(45deg,var(--secondary-color), var(--primary-color)); color:#fff; padding:.45rem .9rem; border:none; border-radius:30px; cursor:pointer; transition:.3s; }
 .pt-cta:hover { transform:translateY(-3px); box-shadow:0 8px 20px -6px rgba(0,0,0,.28); }
+*/
 .nota-minimo { font-size:.7rem; text-transform:uppercase; letter-spacing:.6px; color: var(--text-light); font-weight:600; text-align:center; }
 .social-proof-precios { text-align:center; font-size:.75rem; letter-spacing:.5px; font-weight:600; color:#4d7f54; margin-top:.2rem; }
+
+/* Secciones de formato */
+.formato-section {
+    margin-bottom: 2rem;
+}
+.formato-section:last-child {
+    margin-bottom: 0;
+}
+.formato-titulo {
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.formato-titulo.formato-12oz {
+    color: var(--primary-color);
+}
+.formato-titulo.formato-9oz {
+    color: var(--secondary-color);
+}
+/* Precios simplificados */
+.precios-grid-simple {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.precio-tramo-simple {
+    position: relative;
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 2px solid #f1e4e4;
+    box-shadow: 0 3px 12px -4px rgba(0,0,0,.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: .5rem;
+    transition: .3s;
+    cursor: pointer;
+    min-width: 140px;
+}
+
+.precio-tramo-simple:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,.15);
+}
+
+.precio-tramo-simple[data-best="true"] {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px -4px rgba(0,0,0,.2);
+}
+
+.precio-tramo-simple.formato-12oz {
+    border-color: rgba(255, 111, 0, 0.3);
+}
+
+.precio-tramo-simple.formato-12oz:hover {
+    border-color: var(--primary-color);
+}
+
+.precio-tramo-simple.formato-9oz {
+    border-color: rgba(0, 123, 255, 0.3);
+}
+
+.precio-tramo-simple.formato-9oz:hover {
+    border-color: var(--secondary-color);
+}
+
+.precio-tramo-simple.formato-12oz[data-best="true"] {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg,#ffffff 0%, #fff5f0 100%);
+}
+
+.precio-tramo-simple.formato-9oz[data-best="true"] {
+    border-color: var(--secondary-color);
+    background: linear-gradient(135deg,#ffffff 0%, #f0f8ff 100%);
+}
+
+.precio-badge-simple {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--secondary-color);
+    color: #fff;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    font-size: .5rem;
+    letter-spacing: .5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    box-shadow: 0 2px 8px -2px rgba(0,0,0,.3);
+}
+
+.pt-rango-simple {
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    letter-spacing: .3px;
+}
+
+.pt-precio-simple {
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.precio-tramo-simple.formato-9oz .pt-precio-simple {
+    color: var(--secondary-color);
+}
+/* Estilos antiguos de formato - comentados
+.precio-tramo.formato-12oz {
+    border-color: rgba(255, 111, 0, 0.2);
+}
+.precio-tramo.formato-12oz:hover {
+    border-color: var(--primary-color);
+}
+.precio-tramo.formato-9oz {
+    border-color: rgba(0, 123, 255, 0.2);
+}
+.precio-tramo.formato-9oz:hover {
+    border-color: var(--secondary-color);
+}
+.precio-tramo.formato-12oz[data-best="true"] {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg,#ffffff 0%, #fff5f0 100%);
+}
+.precio-tramo.formato-9oz[data-best="true"] {
+    border-color: var(--secondary-color);
+    background: linear-gradient(135deg,#ffffff 0%, #f0f8ff 100%);
+}
+*/
+
 @media (max-width:760px){
-    .precios-cards { gap:1.3rem; }
-    .precio-tramo[data-best="true"] { transform: scale(1.03); }
+    .precios-cards { gap:1rem; }
+    .precios-grid-simple {
+        gap: .8rem;
+        max-width: 100%;
+    }
+    .precio-tramo-simple {
+        min-width: 120px;
+        padding: .8rem;
+    }
+    .precio-tramo-simple[data-best="true"] { 
+        transform: scale(1.03); 
+    }
+    .formato-section {
+        margin-bottom: 1.5rem;
+    }
+    .formato-titulo {
+        font-size: 1.2rem;
+        margin-bottom: .8rem;
+    }
+    .pt-precio-simple {
+        font-size: 1.2rem;
+    }
+    .pt-rango-simple {
+        font-size: .7rem;
+    }
 }
 
 /* Cobertura Section */

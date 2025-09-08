@@ -1,13 +1,18 @@
 // ==========================
 // Constantes de configuración mayorista
 // ==========================
-const MINIMO_PEDIDO = 24; // Pedido mínimo mayorista (2 docenas)
-// Nuevos tramos de precios mayoristas
-const UMBRAL_TIER2 = 48; // desde 48 (4 docenas)
-const UMBRAL_TIER3 = 72; // desde 72 (6 docenas)
-const PRECIO_TIER1 = 1200; // 24 - 47 unidades
-const PRECIO_TIER2 = 1100; // 48 - 71 unidades  
-const PRECIO_TIER3 = 1000; // 72+ unidades
+const MINIMO_PEDIDO = 6; // Pedido mínimo mayorista (6 unidades cualquier formato)
+// Tramos de precios mayoristas formato 12oz
+const UMBRAL_TIER2 = 15; // desde 15 unidades
+const UMBRAL_TIER3 = 20; // desde 20 unidades
+const PRECIO_12OZ_TIER1 = 1700; // 6 - 14 unidades
+const PRECIO_12OZ_TIER2 = 1600; // 15 - 19 unidades  
+const PRECIO_12OZ_TIER3 = 1500; // 20+ unidades
+
+// Tramos de precios mayoristas formato 9oz
+const PRECIO_9OZ_TIER1 = 1500; // 6 - 14 unidades
+const PRECIO_9OZ_TIER2 = 1400; // 15 - 19 unidades  
+const PRECIO_9OZ_TIER3 = 1250; // 20+ unidades
 const EMAIL_DESTINO = 'ventas@deliciasflorencia.cl'; // Email comercial
 const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna', 'Zona de cobertura']);
 // Coordenadas aproximadas de comunas (centroides simplificados)
@@ -23,11 +28,18 @@ const COMUNAS_COORDS = Object.freeze({
 // ==========================
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-function getPrecioUnitario(total) {
-    if (total >= UMBRAL_TIER3) return PRECIO_TIER3;
-    if (total >= UMBRAL_TIER2) return PRECIO_TIER2;
-    if (total >= MINIMO_PEDIDO) return PRECIO_TIER1;
-    return PRECIO_TIER1; // fallback (no debería cotizar por debajo del mínimo)
+function getPrecioUnitario(total, formato = '12oz') {
+    if (formato === '9oz') {
+        if (total >= UMBRAL_TIER3) return PRECIO_9OZ_TIER3;
+        if (total >= UMBRAL_TIER2) return PRECIO_9OZ_TIER2;
+        if (total >= MINIMO_PEDIDO) return PRECIO_9OZ_TIER1;
+        return PRECIO_9OZ_TIER1; // fallback
+    } else {
+        if (total >= UMBRAL_TIER3) return PRECIO_12OZ_TIER3;
+        if (total >= UMBRAL_TIER2) return PRECIO_12OZ_TIER2;
+        if (total >= MINIMO_PEDIDO) return PRECIO_12OZ_TIER1;
+        return PRECIO_12OZ_TIER1; // fallback
+    }
 }
 
 // Accesibilidad: actualización discreta de estado
@@ -40,21 +52,36 @@ function announce(msg) {
 // Datos (restaurado)
 // ==========================
 const saboresData = Object.freeze([
-    { key: 'pina-crema', nombre: 'Piña Crema', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'], imagen: 'pina-crema.jpg' },
-    { key: 'oreo', nombre: 'Oreo', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'], imagen: 'oreo.jpg' },
-    { key: 'tres-leches', nombre: 'Tres Leches', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'], imagen: 'tres-leches.png' },
-    { key: 'selva-negra', nombre: 'Selva Negra', precio: PRECIO_TIER3, ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'], imagen: 'selva-negra.jpg' }
+    // Formato 12oz
+    { key: 'pina-crema-12oz', nombre: 'Piña Crema (12oz)', precio: PRECIO_12OZ_TIER3, formato: '12oz', ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'], imagen: 'pina-crema.jpg' },
+    { key: 'oreo-12oz', nombre: 'Oreo (12oz)', precio: PRECIO_12OZ_TIER3, formato: '12oz', ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'], imagen: 'oreo.jpg' },
+    { key: 'tres-leches-12oz', nombre: 'Tres Leches (12oz)', precio: PRECIO_12OZ_TIER3, formato: '12oz', ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'], imagen: 'tres-leches.png' },
+    { key: 'selva-negra-12oz', nombre: 'Selva Negra (12oz)', precio: PRECIO_12OZ_TIER3, formato: '12oz', ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'], imagen: 'selva-negra.jpg' },
+    // Formato 9oz
+    { key: 'pina-crema-9oz', nombre: 'Piña Crema (9oz)', precio: PRECIO_9OZ_TIER3, formato: '9oz', ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'], imagen: 'pina-crema.jpg' },
+    { key: 'oreo-9oz', nombre: 'Oreo (9oz)', precio: PRECIO_9OZ_TIER3, formato: '9oz', ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'], imagen: 'oreo.jpg' },
+    { key: 'tres-leches-9oz', nombre: 'Tres Leches (9oz)', precio: PRECIO_9OZ_TIER3, formato: '9oz', ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'], imagen: 'tres-leches.png' },
+    { key: 'selva-negra-9oz', nombre: 'Selva Negra (9oz)', precio: PRECIO_9OZ_TIER3, formato: '9oz', ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'], imagen: 'selva-negra.jpg' }
 ]);
 
 const cantidades = Object.fromEntries(saboresData.map(s => [s.key, 0]));
 
 // ==========================
-// Render dinámico tarjetas pedido (restaurado)
+// Render dinámico tarjetas pedido (optimizado)
 // ==========================
 function renderSaboresPedido() {
     const cont = document.getElementById('sabores-pedido');
     if (!cont) return;
-    cont.innerHTML = saboresData.map(s => {
+    
+    // Obtener sabores únicos (sin duplicar por formato)
+    const saboresUnicos = [
+        { key: 'pina-crema', nombre: 'Piña Crema', ingredientes: ['Bizcocho Blanco', 'Piña', 'Crema', 'Manjar'], imagen: 'pina-crema.jpg' },
+        { key: 'oreo', nombre: 'Oreo', ingredientes: ['Bizcocho Chocolate', 'Crema', 'Galleta Oreo', 'Manjar'], imagen: 'oreo.jpg' },
+        { key: 'tres-leches', nombre: 'Tres Leches', ingredientes: ['Bizcocho Blanco', 'Tres tipos de leche', 'Crema Chantilly'], imagen: 'tres-leches.png' },
+        { key: 'selva-negra', nombre: 'Selva Negra', ingredientes: ['Bizcocho Chocolate', 'Cerezas', 'Crema Chantilly', 'Virutas de chocolate'], imagen: 'selva-negra.jpg' }
+    ];
+    
+    cont.innerHTML = saboresUnicos.map(s => {
         const ingredientes = s.ingredientes.map(i => `<li>${i}</li>`).join('');
         return `
         <div class="sabor-card-pedido" data-sabor="${s.key}">
@@ -68,34 +95,81 @@ function renderSaboresPedido() {
                     <ul>${ingredientes}</ul>
                 </div>
             </div>
-            <div class="sabor-cantidad-row">
-                <button type="button" class="menos-btn" aria-label="Restar ${s.nombre}">-</button>
-                <span class="cantidad" aria-live="off">0</span>
-                <button type="button" class="mas-btn" aria-label="Sumar ${s.nombre}">+</button>
+            <div class="formatos-controles">
+                <div class="formato-control" data-formato="12oz">
+                    <div class="formato-header">
+                        <span class="formato-label">12oz</span>
+                        <span class="formato-precio">$${getPrecioUnitario(MINIMO_PEDIDO, '12oz').toLocaleString('es-CL')}</span>
+                    </div>
+                    <div class="sabor-cantidad-row">
+                        <button type="button" class="menos-btn" data-formato="12oz" aria-label="Restar ${s.nombre} 12oz">-</button>
+                        <span class="cantidad" data-formato="12oz" aria-live="off">0</span>
+                        <button type="button" class="mas-btn" data-formato="12oz" aria-label="Sumar ${s.nombre} 12oz">+</button>
+                    </div>
+                </div>
+                <div class="formato-control" data-formato="9oz">
+                    <div class="formato-header">
+                        <span class="formato-label">9oz</span>
+                        <span class="formato-precio">$${getPrecioUnitario(MINIMO_PEDIDO, '9oz').toLocaleString('es-CL')}</span>
+                    </div>
+                    <div class="sabor-cantidad-row">
+                        <button type="button" class="menos-btn" data-formato="9oz" aria-label="Restar ${s.nombre} 9oz">-</button>
+                        <span class="cantidad" data-formato="9oz" aria-live="off">0</span>
+                        <button type="button" class="mas-btn" data-formato="9oz" aria-label="Sumar ${s.nombre} 9oz">+</button>
+                    </div>
+                </div>
             </div>
         </div>`;
     }).join('');
 }
 
 // ==========================
-// Render y estado carrito (restaurado)
+// Render y estado carrito (optimizado)
 // ==========================
 function actualizarResumen() {
     const cards = $$('.sabor-card-pedido');
     let totalCantidad = 0;
+    let total12oz = 0;
+    let total9oz = 0;
+    
     cards.forEach(card => {
-        const key = card.getAttribute('data-sabor');
-        const cantidadSpan = card.querySelector('.cantidad');
-        const menosBtn = card.querySelector('.menos-btn');
-        const val = cantidades[key] || 0;
-        if (cantidadSpan) cantidadSpan.textContent = val;
-        if (menosBtn) menosBtn.disabled = val === 0;
-        if (cantidadSpan) {
-            cantidadSpan.classList.remove('bump');
-            void cantidadSpan.offsetWidth;
-            cantidadSpan.classList.add('bump');
+        const saborKey = card.getAttribute('data-sabor');
+        
+        // Actualizar controles para cada formato
+        ['12oz', '9oz'].forEach(formato => {
+            const key = `${saborKey}-${formato}`;
+            const cantidadSpan = card.querySelector(`.cantidad[data-formato="${formato}"]`);
+            const menosBtn = card.querySelector(`.menos-btn[data-formato="${formato}"]`);
+            const val = cantidades[key] || 0;
+            
+            if (cantidadSpan) cantidadSpan.textContent = val;
+            if (menosBtn) menosBtn.disabled = val === 0;
+            if (cantidadSpan) {
+                cantidadSpan.classList.remove('bump');
+                void cantidadSpan.offsetWidth;
+                cantidadSpan.classList.add('bump');
+            }
+            
+            totalCantidad += val;
+            if (formato === '12oz') {
+                total12oz += val;
+            } else {
+                total9oz += val;
+            }
+        });
+    });
+
+    // Actualizar precios mostrados en tiempo real
+    cards.forEach(card => {
+        const precio12ozSpan = card.querySelector('.formato-control[data-formato="12oz"] .formato-precio');
+        const precio9ozSpan = card.querySelector('.formato-control[data-formato="9oz"] .formato-precio');
+        
+        if (precio12ozSpan) {
+            precio12ozSpan.textContent = `$${getPrecioUnitario(total12oz, '12oz').toLocaleString('es-CL')}`;
         }
-        totalCantidad += val;
+        if (precio9ozSpan) {
+            precio9ozSpan.textContent = `$${getPrecioUnitario(total9oz, '9oz').toLocaleString('es-CL')}`;
+        }
     });
 
     const resumenLista = $('#resumen-lista');
@@ -110,31 +184,53 @@ function actualizarResumen() {
         });
     }
 
-    const precioUnitario = getPrecioUnitario(totalCantidad);
-    const totalFinal = totalCantidad * precioUnitario;
+    // Calcular totales por formato
+    const precio12oz = getPrecioUnitario(total12oz, '12oz');
+    const precio9oz = getPrecioUnitario(total9oz, '9oz');
+    const total12ozMonto = total12oz * precio12oz;
+    const total9ozMonto = total9oz * precio9oz;
+    const totalFinal = total12ozMonto + total9ozMonto;
+
     const resumenPrecioUnitario = $('#resumen-precio-unitario');
     const resumenTotalCantidad = $('#resumen-total-cantidad');
     const resumenTotal = $('#resumen-total');
     const upsellHint = $('#upsell-hint');
-    if (resumenPrecioUnitario) resumenPrecioUnitario.textContent = `$${precioUnitario.toLocaleString('es-CL')}`;
+    
+    // Mostrar información de precios
+    if (resumenPrecioUnitario) {
+        let textoPrecios = '';
+        if (total12oz > 0 && total9oz > 0) {
+            textoPrecios = `12oz: $${precio12oz.toLocaleString('es-CL')} | 9oz: $${precio9oz.toLocaleString('es-CL')}`;
+        } else if (total12oz > 0) {
+            textoPrecios = `$${precio12oz.toLocaleString('es-CL')} (12oz)`;
+        } else if (total9oz > 0) {
+            textoPrecios = `$${precio9oz.toLocaleString('es-CL')} (9oz)`;
+        } else {
+            textoPrecios = 'Selecciona productos';
+        }
+        resumenPrecioUnitario.textContent = textoPrecios;
+    }
+    
     if (resumenTotalCantidad) resumenTotalCantidad.textContent = totalCantidad;
     if (resumenTotal) resumenTotal.textContent = `$${totalFinal.toLocaleString('es-CL')}`;
 
-        if (upsellHint) {
+    if (upsellHint) {
         let msg = '';
         if (totalCantidad >= MINIMO_PEDIDO && totalCantidad < UMBRAL_TIER2) {
             const faltan = UMBRAL_TIER2 - totalCantidad;
-            msg = `Agrega ${faltan} unidad${faltan===1?'':'es'} más y baja a $${PRECIO_TIER2.toLocaleString('es-CL')} c/u (precio mayorista 2).`;
+            msg = `Agrega ${faltan} unidad${faltan===1?'':'es'} más y mejora el precio unitario (precio mayorista 2).`;
         } else if (totalCantidad >= UMBRAL_TIER2 && totalCantidad < UMBRAL_TIER3) {
             const faltan = UMBRAL_TIER3 - totalCantidad;
-            msg = `Con ${faltan} unidad${faltan===1?'':'es'} más alcanzas $${PRECIO_TIER3.toLocaleString('es-CL')} c/u (mejor precio mayorista).`;
+            msg = `Con ${faltan} unidad${faltan===1?'':'es'} más alcanzas el mejor precio mayorista.`;
         } else if (totalCantidad >= UMBRAL_TIER3) {
-            msg = `Tienes el mejor precio mayorista ($${PRECIO_TIER3.toLocaleString('es-CL')} c/u).`;
+            msg = `Tienes el mejor precio mayorista.`;
         } else {
             msg = `Mínimo ${MINIMO_PEDIDO} unidades para distribución mayorista.`;
         }
         upsellHint.textContent = msg;
-    }    const btnSolicitar = $('#btn-solicitar-pedido');
+    }
+
+    const btnSolicitar = $('#btn-solicitar-pedido');
     const mobileBar = $('#mobile-cta-bar');
     const mobileTotal = $('#mobile-bar-total');
     const mobileBtn = $('#btn-solicitar-mobile');
@@ -153,10 +249,10 @@ function actualizarResumen() {
         document.body.style.paddingBottom = totalCantidad > 0 ? '70px' : '';
     }
 
-    announce(`Total ${totalCantidad} unidades. Precio unitario ${precioUnitario}. Total ${totalFinal}`);
+    announce(`Total ${totalCantidad} unidades. Total ${totalFinal}`);
 }
 
-// Delegación de eventos para + / -
+// Delegación de eventos para + / - (optimizada)
 function configurarDelegacionCantidad() {
     const contenedor = $('.sabores-cards');
     if (!contenedor) return;
@@ -165,8 +261,12 @@ function configurarDelegacionCantidad() {
         if (!btn) return;
         const card = btn.closest('.sabor-card-pedido');
         if (!card) return;
-        const key = card.getAttribute('data-sabor');
-        if (!key) return;
+        const saborKey = card.getAttribute('data-sabor');
+        const formato = btn.getAttribute('data-formato');
+        if (!saborKey || !formato) return;
+        
+        const key = `${saborKey}-${formato}`;
+        
         if (btn.classList.contains('mas-btn')) {
             cantidades[key] = (cantidades[key] || 0) + 1;
             actualizarResumen();
@@ -183,8 +283,26 @@ function dispararSolicitud(e) {
     if (e) e.preventDefault();
     const totalCantidad = Object.values(cantidades).reduce((a, b) => a + b, 0);
     if (totalCantidad < MINIMO_PEDIDO) return;
-    const precioUnitario = getPrecioUnitario(totalCantidad);
-    const totalFinal = totalCantidad * precioUnitario;
+    
+    // Calcular totales por formato
+    let total12oz = 0;
+    let total9oz = 0;
+    saboresData.forEach(s => {
+        if (cantidades[s.key] > 0) {
+            if (s.formato === '12oz') {
+                total12oz += cantidades[s.key];
+            } else if (s.formato === '9oz') {
+                total9oz += cantidades[s.key];
+            }
+        }
+    });
+    
+    const precio12oz = getPrecioUnitario(total12oz, '12oz');
+    const precio9oz = getPrecioUnitario(total9oz, '9oz');
+    const total12ozMonto = total12oz * precio12oz;
+    const total9ozMonto = total9oz * precio9oz;
+    const totalFinal = total12ozMonto + total9ozMonto;
+    
     const saboresSeleccionados = saboresData.filter(s => cantidades[s.key] > 0);
     if (!saboresSeleccionados.length) return;
     
@@ -217,12 +335,29 @@ function dispararSolicitud(e) {
     body += `Dirección: ${direccion}%0D%0A`;
     if (comentarios) body += `Volumen estimado: ${comentarios}%0D%0A`;
     body += `%0D%0A--- PRODUCTOS DE INTERÉS ---%0D%0A`;
-    saboresSeleccionados.forEach(s => {
-        body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
-    });
+    
+    // Agrupar por formato
+    const sabores12oz = saboresSeleccionados.filter(s => s.formato === '12oz');
+    const sabores9oz = saboresSeleccionados.filter(s => s.formato === '9oz');
+    
+    if (sabores12oz.length > 0) {
+        body += `%0D%0AFormato 12oz:%0D%0A`;
+        sabores12oz.forEach(s => {
+            body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
+        });
+        body += `Subtotal 12oz: ${total12oz} unidades a $${precio12oz.toLocaleString('es-CL')} c/u = $${total12ozMonto.toLocaleString('es-CL')}%0D%0A`;
+    }
+    
+    if (sabores9oz.length > 0) {
+        body += `%0D%0AFormato 9oz:%0D%0A`;
+        sabores9oz.forEach(s => {
+            body += `- ${s.nombre}: ${cantidades[s.key]} unidad(es)%0D%0A`;
+        });
+        body += `Subtotal 9oz: ${total9oz} unidades a $${precio9oz.toLocaleString('es-CL')} c/u = $${total9ozMonto.toLocaleString('es-CL')}%0D%0A`;
+    }
+    
     body += `%0D%0ATotal estimado: ${totalCantidad} unidades%0D%0A`;
-    body += `Precio mayorista: $${precioUnitario.toLocaleString('es-CL')} c/u%0D%0A`;
-    body += `Valor referencial: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
+    body += `Valor referencial total: $${totalFinal.toLocaleString('es-CL')}%0D%0A`;
     body += `%0D%0AOrigen: Sitio Web Distribución - Delicias Florencia`;
     
     const subject = `Solicitud comercial ${negocio} - ${tipo} (${totalCantidad} uds)`;
@@ -379,49 +514,84 @@ function renderPreciosTramos() {
     const cont = document.getElementById('precios-cards');
     if (!cont) return;
     try { cont.setAttribute('data-status','generating'); } catch {}
-    const tramos = [
+    
+    // Tramos para formato 12oz
+    const tramos12oz = [
         {
             titulo:'Tramo 1 - Inicial',
             rango:`${MINIMO_PEDIDO} - ${UMBRAL_TIER2 - 1} uds`,
-            precio:PRECIO_TIER1,
+            precio:PRECIO_12OZ_TIER1,
             ahorro:null,
-            descripcion: '2-4 docenas'
+            formato: '12oz'
         },
         {
             titulo:'Tramo 2 - Frecuente', 
             rango:`${UMBRAL_TIER2} - ${UMBRAL_TIER3 - 1} uds`,
-            precio:PRECIO_TIER2,
-            ahorro: PRECIO_TIER1 - PRECIO_TIER2,
-            descripcion: '4-6 docenas'
+            precio:PRECIO_12OZ_TIER2,
+            ahorro: PRECIO_12OZ_TIER1 - PRECIO_12OZ_TIER2,
+            formato: '12oz'
         },
         {
             titulo:'Tramo 3 - Mayorista',
             rango:`${UMBRAL_TIER3}+ uds`,
-            precio:PRECIO_TIER3,
-            ahorro: PRECIO_TIER2 - PRECIO_TIER3,
-            descripcion: '6+ docenas'
+            precio:PRECIO_12OZ_TIER3,
+            ahorro: PRECIO_12OZ_TIER2 - PRECIO_12OZ_TIER3,
+            formato: '12oz'
         }
     ];
-    const menorPrecio = Math.min(...tramos.map(t=>t.precio));
-    cont.innerHTML = tramos.map(t => {
-        const best = t.precio === menorPrecio;
-        let ahorroTxt = '';
-        if (t.ahorro) {
-            const prevPrecio = t.precio + t.ahorro; // reconstruir precio anterior
-            const pct = ((t.ahorro / prevPrecio) * 100).toFixed(0);
-            ahorroTxt = `Ahorro $${t.ahorro.toLocaleString('es-CL')} c/u · <strong>↓${pct}%</strong>`;
+
+    // Tramos para formato 9oz
+    const tramos9oz = [
+        {
+            titulo:'Tramo 1 - Inicial',
+            rango:`${MINIMO_PEDIDO} - ${UMBRAL_TIER2 - 1} uds`,
+            precio:PRECIO_9OZ_TIER1,
+            ahorro:null,
+            formato: '9oz'
+        },
+        {
+            titulo:'Tramo 2 - Frecuente', 
+            rango:`${UMBRAL_TIER2} - ${UMBRAL_TIER3 - 1} uds`,
+            precio:PRECIO_9OZ_TIER2,
+            ahorro: PRECIO_9OZ_TIER1 - PRECIO_9OZ_TIER2,
+            formato: '9oz'
+        },
+        {
+            titulo:'Tramo 3 - Mayorista',
+            rango:`${UMBRAL_TIER3}+ uds`,
+            precio:PRECIO_9OZ_TIER3,
+            ahorro: PRECIO_9OZ_TIER2 - PRECIO_9OZ_TIER3,
+            formato: '9oz'
         }
-        return `<article class="precio-tramo" data-best="${best}" aria-label="${t.titulo} ${t.rango} precio $${t.precio.toLocaleString('es-CL')}${best?' mejor precio':''}">
-            ${best ? '<span class="precio-tramo-badge">Mejor precio</span>' : ''}
-            <h3 class="pt-titulo">${t.titulo}</h3>
-            <div class="pt-monto" aria-hidden="true">$${t.precio.toLocaleString('es-CL')}</div>
-            <div class="pt-unit">c/u</div>
-            <div class="pt-rango">${t.rango}</div>
-            <div class="pt-descripcion">${t.descripcion}</div>
-            <div class="pt-ahorro">${ahorroTxt}</div>
-            <button class="pt-cta" data-ir-cotizar="true" aria-label="Cotizar ${t.titulo}">Ver Catálogo</button>
-        </article>`;
-    }).join('');
+    ];
+
+    const menorPrecio12oz = Math.min(...tramos12oz.map(t=>t.precio)); // Mejor precio 12oz
+    const menorPrecio9oz = Math.min(...tramos9oz.map(t=>t.precio)); // Mejor precio 9oz
+    
+    function generarTarjetasFormato(tramos, tituloFormato, colorAccent = '') {
+        return `
+        <div class="formato-section">
+            <h3 class="formato-titulo ${colorAccent}">${tituloFormato}</h3>
+            <div class="precios-grid-simple">
+                ${tramos.map(t => {
+                    // Cada formato tiene su propio "mejor precio"
+                    const best = (t.formato === '12oz' && t.precio === menorPrecio12oz) || 
+                                 (t.formato === '9oz' && t.precio === menorPrecio9oz);
+                    return `<article class="precio-tramo-simple ${colorAccent}" data-best="${best}" aria-label="${t.rango} precio $${t.precio.toLocaleString('es-CL')}${best?' mejor precio':''}">
+                        ${best ? '<span class="precio-badge-simple">Mejor precio</span>' : ''}
+                        <div class="pt-rango-simple">${t.rango}</div>
+                        <div class="pt-precio-simple">$${t.precio.toLocaleString('es-CL')}</div>
+                    </article>`;
+                }).join('')}
+            </div>
+        </div>`;
+    }
+
+    cont.innerHTML = `
+        ${generarTarjetasFormato(tramos12oz, 'Formato 12oz', 'formato-12oz')}
+        ${generarTarjetasFormato(tramos9oz, 'Formato 9oz', 'formato-9oz')}
+    `;
+
     try { cont.setAttribute('data-status','ready'); } catch {}
     if (!cont.innerHTML.trim()) {
         // Fallback estático (no debería ocurrir)
@@ -429,13 +599,13 @@ function renderPreciosTramos() {
     }
 
     cont.addEventListener('click', (e)=>{
-        const btn = e.target.closest('button[data-ir-cotizar]');
-        if (!btn) return;
+        const tarjeta = e.target.closest('.precio-tramo-simple');
+        if (!tarjeta) return;
         const destino = document.getElementById('cotizar');
         if (destino) destino.scrollIntoView({behavior:'smooth'});
     });
     const nota = document.getElementById('nota-minimo');
-    if (nota) nota.textContent = `Pedido mínimo para distribución: ${MINIMO_PEDIDO} unidades. Puedes combinar sabores.`;
+    if (nota) nota.textContent = `Pedido mínimo para distribución: ${MINIMO_PEDIDO} unidades (puedes combinar sabores y formatos).`;
 }
 
 
