@@ -9,7 +9,7 @@ const PRECIO_TIER1 = 1200; // 24 - 47 unidades
 const PRECIO_TIER2 = 1100; // 48 - 71 unidades  
 const PRECIO_TIER3 = 1000; // 72+ unidades
 const EMAIL_DESTINO = 'ventas@deliciasflorencia.cl'; // Email comercial
-const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna', 'Zona de distribución']);
+const COMUNAS_PERMITIDAS = Object.freeze(['San Bernardo','La Pintana','El Bosque','La Cisterna', 'Zona de cobertura']);
 // Coordenadas aproximadas de comunas (centroides simplificados)
 const COMUNAS_COORDS = Object.freeze({
     'San Bernardo': { lat: -33.606246, lng: -70.700462 },
