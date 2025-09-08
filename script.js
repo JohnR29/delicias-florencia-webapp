@@ -309,13 +309,11 @@ function dispararSolicitud(e) {
     const negocio = $('#campo-nombre')?.value.trim();
     const contacto = $('#campo-contacto')?.value.trim();
     const telefono = $('#campo-telefono')?.value.trim();
-    const email = $('#campo-email')?.value.trim();
     const tipo = $('#campo-tipo')?.value;
     const comuna = $('#campo-comuna')?.value;
     const direccion = $('#campo-direccion')?.value.trim();
-    const comentarios = $('#campo-comentarios')?.value.trim();
     
-    if (!negocio || !contacto || !telefono || !email || !tipo || !comuna || !direccion) {
+    if (!negocio || !contacto || !telefono || !tipo || !comuna || !direccion) {
         alert('Por favor completa todos los campos obligatorios.');
         return;
     }
@@ -329,11 +327,9 @@ function dispararSolicitud(e) {
     body += `Negocio: ${negocio}%0D%0A`;
     body += `Contacto: ${contacto}%0D%0A`;
     body += `Teléfono: ${telefono}%0D%0A`;
-    body += `Email: ${email}%0D%0A`;
     body += `Tipo de negocio: ${tipo}%0D%0A`;
     body += `Comuna: ${comuna}%0D%0A`;
     body += `Dirección: ${direccion}%0D%0A`;
-    if (comentarios) body += `Volumen estimado: ${comentarios}%0D%0A`;
     body += `%0D%0A--- PRODUCTOS DE INTERÉS ---%0D%0A`;
     
     // Agrupar por formato
