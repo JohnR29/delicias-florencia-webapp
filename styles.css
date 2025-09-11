@@ -641,313 +641,190 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     background: linear-gradient(135deg, #f8f9fa 0%, var(--bg-light) 100%);
 }
 
-.formatos-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 3rem;
-    margin-bottom: 3rem;
-}
-
-.formato-showcase {
-    background: var(--white);
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-    transition: var(--transition);
-    border: 1px solid #e8e9ea;
-}
-
-.formato-showcase:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
-}
-
-.formato-header {
-    padding: 1.5rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    text-align: center;
+.formato-visual-container {
+    width: 432px;
+    height: 400px;
     position: relative;
-}
-
-.formato-header-compact {
-    background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
-}
-
-.formato-header h3 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
-}
-
-.formato-badge {
-    display: inline-block;
-    background: rgba(255,255,255,0.25);
-    padding: 0.4rem 1rem;
-    border-radius: 25px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    backdrop-filter: blur(10px);
-}
-
-.formato-badge-compact {
-    background: rgba(0,0,0,0.1);
-}
-
-.producto-breakdown {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 2rem;
-    padding: 2rem;
-    align-items: center;
-}
-
-.producto-imagen-container {
+    margin: 0 auto;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 1rem;
-    position: relative;
 }
 
-.producto-imagen {
-    max-width: 180px;
-    height: auto;
+.formato-imagen {
+    width: 300px;
+    height: 400px;
+    position: absolute;
+    left: 0;
+    top: 0;
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    transition: var(--transition);
+    object-fit: cover;
 }
 
-.producto-imagen:hover {
-    transform: scale(1.05);
-}
-
-.imagen-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--primary-color);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-.capas-visuales h4 {
-    color: var(--text-dark);
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0 0 1rem 0;
-    text-align: center;
-}
-
-.capas-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.capa-visual {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    transition: var(--transition);
-    border-left: 4px solid transparent;
-}
-
-.capa-visual:hover {
-    transform: translateX(5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-
-.capa-top {
-    background: linear-gradient(45deg, #fff3cd, #ffeaa7);
-    border-left-color: #e17055;
-}
-
-.capa-bizcocho {
-    background: linear-gradient(45deg, #f8d7da, #f5c6cb);
-    border-left-color: #c3251d;
-}
-
-.capa-relleno {
-    background: linear-gradient(45deg, #d4edda, #c3e6cb);
-    border-left-color: var(--primary-color);
-}
-
-.capa-base {
-    background: linear-gradient(45deg, #d1ecf1, #bee5eb);
-    border-left-color: var(--secondary-color);
-}
-
-.capa-numero {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Puntos indicadores de capas */
+.capa-punto {
     width: 30px;
     height: 30px;
-    background: var(--primary-color);
-    color: white;
+    position: absolute;
+    background: rgba(76, 239, 17, 0.5);
     border-radius: 50%;
-    font-weight: 700;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    border: 2px solid var(--text-dark);
+    transition: var(--transition);
+    cursor: pointer;
+    z-index: 2;
 }
 
-.capa-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    flex: 1;
+.capa-punto:hover {
+    background: rgba(76, 239, 17, 0.8);
+    transform: scale(1.1);
 }
 
-.capa-info strong {
-    color: var(--text-dark);
-    font-weight: 600;
-    font-size: 0.9rem;
-}
+/* Posiciones específicas para cada punto */
+.capa-punto-1 { left: 141px; top: 338px; }
+.capa-punto-2 { left: 141px; top: 298px; }
+.capa-punto-3 { left: 141px; top: 256px; }
+.capa-punto-4 { left: 141px; top: 207px; }
+.capa-punto-5 { left: 141px; top: 163px; }
+.capa-punto-6 { left: 141px; top: 110px; }
 
-.capa-info span {
-    color: var(--text-light);
-    font-size: 0.8rem;
-    font-style: italic;
-}
-
-.formato-specs {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
-    padding: 1rem;
-    background: var(--accent-color);
-    border-radius: 8px;
-    color: var(--text-dark);
-    font-weight: 600;
-    text-align: center;
-}
-
-.formato-specs i {
-    color: var(--primary-color);
-    font-size: 1.1rem;
-}
-
-.especificaciones-note {
-    margin-top: 3rem;
-}
-
-.note-card {
+/* Etiquetas de descripción */
+.capa-etiqueta {
+    position: absolute;
     background: var(--white);
-    padding: 2.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    display: flex;
-    align-items: flex-start;
-    gap: 2rem;
-    border-left: 6px solid var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid #e0e0e0;
+    z-index: 3;
+    transition: var(--transition);
 }
 
-.note-card i {
-    color: var(--primary-color);
-    font-size: 2.5rem;
-    margin-top: 0.2rem;
-    flex-shrink: 0;
+.capa-etiqueta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
 }
 
-.note-content h4 {
+.etiqueta-texto {
+    display: block;
+    padding: 8px 12px;
     color: var(--text-dark);
-    font-size: 1.3rem;
-    margin-bottom: 0.8rem;
-    font-weight: 600;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    line-height: 1.2;
+    white-space: nowrap;
 }
 
-.note-content p {
-    color: var(--text-light);
-    line-height: 1.7;
-    margin: 0;
-    font-size: 1rem;
+/* Posiciones específicas para cada etiqueta */
+.capa-etiqueta-1 {
+    left: 274px;
+    top: 339px;
 }
 
-.note-content strong {
-    color: var(--primary-color);
-    font-weight: 600;
+.capa-etiqueta-2 {
+    left: 274px;
+    top: 299px;
 }
 
-/* Animación de aparición secuencial */
-.capa-visual {
-    animation: slideInFromLeft 0.6s ease-out forwards;
+.capa-etiqueta-3 {
+    left: 274px;
+    top: 258px;
+}
+
+.capa-etiqueta-4 {
+    left: 274px;
+    top: 209px;
+}
+
+.capa-etiqueta-5 {
+    left: 274px;
+    top: 164px;
+}
+
+.capa-etiqueta-6 {
+    left: 274px;
+    top: 111px;
+}
+
+/* Animaciones de aparición */
+.capa-punto,
+.capa-etiqueta {
     opacity: 0;
+    animation: fadeInScale 0.6s ease-out forwards;
 }
 
-.capa-visual:nth-child(1) { animation-delay: 0.1s; }
-.capa-visual:nth-child(2) { animation-delay: 0.2s; }
-.capa-visual:nth-child(3) { animation-delay: 0.3s; }
-.capa-visual:nth-child(4) { animation-delay: 0.4s; }
-.capa-visual:nth-child(5) { animation-delay: 0.5s; }
+.capa-punto-1, .capa-etiqueta-1 { animation-delay: 0.1s; }
+.capa-punto-2, .capa-etiqueta-2 { animation-delay: 0.2s; }
+.capa-punto-3, .capa-etiqueta-3 { animation-delay: 0.3s; }
+.capa-punto-4, .capa-etiqueta-4 { animation-delay: 0.4s; }
+.capa-punto-5, .capa-etiqueta-5 { animation-delay: 0.5s; }
+.capa-punto-6, .capa-etiqueta-6 { animation-delay: 0.6s; }
 
-@keyframes slideInFromLeft {
+@keyframes fadeInScale {
     from {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: scale(0.8);
     }
     to {
         opacity: 1;
-        transform: translateX(0);
+        transform: scale(1);
     }
 }
 
-/* Responsive */
+/* Responsive para especificaciones */
 @media (max-width: 768px) {
-    .formatos-grid {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
+    .formato-visual-container {
+        width: 100%;
+        max-width: 350px;
+        height: 320px;
+        transform: scale(0.8);
     }
     
-    .producto-breakdown {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 1.5rem;
-        text-align: center;
+    .formato-imagen {
+        width: 240px;
+        height: 320px;
     }
     
-    .producto-imagen {
-        max-width: 140px;
+    /* Ajustar posiciones proporcionalmente para móvil */
+    .capa-punto-1 { left: 113px; top: 270px; }
+    .capa-punto-2 { left: 113px; top: 238px; }
+    .capa-punto-3 { left: 113px; top: 205px; }
+    .capa-punto-4 { left: 113px; top: 166px; }
+    .capa-punto-5 { left: 113px; top: 130px; }
+    .capa-punto-6 { left: 113px; top: 88px; }
+    
+    .capa-etiqueta-1 { left: 150px; top: 271px; }
+    .capa-etiqueta-2 { left: 150px; top: 239px; }
+    .capa-etiqueta-3 { left: 150px; top: 206px; }
+    .capa-etiqueta-4 { left: 150px; top: 167px; }
+    .capa-etiqueta-5 { left: 150px; top: 131px; }
+    .capa-etiqueta-6 { left: 150px; top: 89px; }
+    
+    .etiqueta-texto {
+        font-size: 13px;
+        padding: 6px 10px;
     }
     
-    .capa-visual {
-        padding: 0.6rem 0.8rem;
+    .capa-punto {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .formato-visual-container {
+        transform: scale(0.7);
+        height: 280px;
     }
     
-    .capa-numero {
-        width: 25px;
-        height: 25px;
-        font-size: 0.8rem;
+    .etiqueta-texto {
+        font-size: 12px;
+        padding: 5px 8px;
     }
     
-    .capa-info strong {
-        font-size: 0.8rem;
-    }
-    
-    .capa-info span {
-        font-size: 0.7rem;
-    }
-    
-    .note-card {
-        flex-direction: column;
-        text-align: center;
-        gap: 1.5rem;
-        padding: 2rem;
-    }
-    
-    .note-card i {
-        margin-top: 0;
+    .capa-punto {
+        width: 20px;
+        height: 20px;
     }
 }
 
