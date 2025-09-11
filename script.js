@@ -634,20 +634,8 @@ function configurarEspecificaciones() {
     const etiquetas = document.querySelectorAll('.capa-etiqueta');
     const lineas = document.querySelectorAll('.capa-linea');
     
-    // Detectar si es un dispositivo táctil
-    const esTactil = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    
-    // Variable para tracking del estado activo
-    let capaActiva = null;
-    let timerDesactivacion = null;
-    
     // Función para activar una capa específica
     function activarCapa(numeroCapa) {
-        // Limpiar timer anterior
-        if (timerDesactivacion) {
-            clearTimeout(timerDesactivacion);
-        }
-        
         // Remover clases activas de todos los elementos
         puntos.forEach(p => p.classList.remove('active'));
         etiquetas.forEach(e => e.classList.remove('active'));
@@ -662,112 +650,65 @@ function configurarEspecificaciones() {
             punto.classList.add('active');
             etiqueta.classList.add('active');
             linea.classList.add('active');
-            capaActiva = numeroCapa;
-            
-            // En móvil, auto-desactivar después de 4 segundos
-            if (esTactil) {
-                timerDesactivacion = setTimeout(() => {
-                    desactivarCapas();
-                }, 4000);
-            }
         }
     }
     
     // Función para desactivar todas las capas
     function desactivarCapas() {
-        if (timerDesactivacion) {
-            clearTimeout(timerDesactivacion);
-        }
-        
         puntos.forEach(p => p.classList.remove('active'));
         etiquetas.forEach(e => e.classList.remove('active'));
         lineas.forEach(l => l.classList.remove('active'));
-        capaActiva = null;
-    }
-    
-    // Función para manejar el toggle en móvil
-    function toggleCapa(numeroCapa) {
-        if (capaActiva === numeroCapa) {
-            desactivarCapas();
-        } else {
-            activarCapa(numeroCapa);
-        }
     }
     
     // Event listeners para puntos
     puntos.forEach(punto => {
         const numeroCapa = punto.getAttribute('data-capa');
         
-        if (esTactil) {
-            // En dispositivos táctiles, usar solo click/touch
-            punto.addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleCapa(numeroCapa);
-            });
+        // Hover en punto
+        punto.addEventListener('mouseenter', () => {
+            activarCapa(numeroCapa);
+        });
+        
+        // Click en punto (para móvil y accesibilidad)
+        punto.addEventListener('click', () => {
+            activarCapa(numeroCapa);
             
-            punto.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                toggleCapa(numeroCapa);
-            });
-        } else {
-            // En desktop, usar hover + click
-            punto.addEventListener('mouseenter', () => {
-                activarCapa(numeroCapa);
-            });
-            
-            punto.addEventListener('click', () => {
-                activarCapa(numeroCapa);
-                timerDesactivacion = setTimeout(() => {
-                    desactivarCapas();
-                }, 3000);
-            });
-        }
+            // Auto-desactivar después de 3 segundos
+            setTimeout(() => {
+                desactivarCapas();
+            }, 3000);
+        });
     });
     
     // Event listeners para etiquetas
     etiquetas.forEach(etiqueta => {
         const numeroCapa = etiqueta.getAttribute('data-capa');
         
-        if (esTactil) {
-            // En dispositivos táctiles, usar solo click/touch
-            etiqueta.addEventListener('click', (e) => {
-                e.preventDefault();
-                toggleCapa(numeroCapa);
-            });
+        // Hover en etiqueta
+        etiqueta.addEventListener('mouseenter', () => {
+            activarCapa(numeroCapa);
+        });
+        
+        // Click en etiqueta
+        etiqueta.addEventListener('click', () => {
+            activarCapa(numeroCapa);
             
-            etiqueta.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                toggleCapa(numeroCapa);
-            });
-        } else {
-            // En desktop, usar hover + click
-            etiqueta.addEventListener('mouseenter', () => {
-                activarCapa(numeroCapa);
-            });
-            
-            etiqueta.addEventListener('click', () => {
-                activarCapa(numeroCapa);
-                timerDesactivacion = setTimeout(() => {
-                    desactivarCapas();
-                }, 3000);
-            });
-        }
+            // Auto-desactivar después de 3 segundos
+            setTimeout(() => {
+                desactivarCapas();
+            }, 3000);
+        });
     });
     
-    // Solo en desktop: desactivar cuando el mouse sale del contenedor
-    if (!esTactil) {
-        const container = document.querySelector('.formato-visual-container');
-        if (container) {
-            container.addEventListener('mouseleave', () => {
-                if (!timerDesactivacion) { // Solo si no hay timer activo por click
-                    desactivarCapas();
-                }
-            });
-        }
+    // Desactivar cuando el mouse sale del contenedor
+    const container = document.querySelector('.formato-visual-container');
+    if (container) {
+        container.addEventListener('mouseleave', () => {
+            desactivarCapas();
+        });
     }
     
-    // Animación de líneas al cargar la página (más lenta para móvil)
-    const delayAnimacion = esTactil ? 2000 : 1500;
+    // Animación de líneas al cargar la página
     setTimeout(() => {
         lineas.forEach((linea, index) => {
             setTimeout(() => {
@@ -775,27 +716,9 @@ function configurarEspecificaciones() {
                 setTimeout(() => {
                     linea.style.transform = 'scaleX(0)';
                 }, 500);
-            }, index * (esTactil ? 150 : 100));
+            }, index * 100);
         });
-    }, delayAnimacion);
-    
-    // En móvil, mostrar indicador visual de que es interactivo
-    if (esTactil) {
-        // Agregar clase para estilos específicos de móvil
-        document.querySelector('.formato-visual-container')?.classList.add('touch-device');
-        
-        // Pulso suave en los puntos para indicar que son interactivos
-        setTimeout(() => {
-            puntos.forEach((punto, index) => {
-                setTimeout(() => {
-                    punto.style.animation = 'pulse 1s ease-in-out';
-                    setTimeout(() => {
-                        punto.style.animation = '';
-                    }, 1000);
-                }, index * 200);
-            });
-        }, 3000);
-    }
+    }, 1500);
 }
 
 // Inicializar especificaciones cuando el DOM esté listo

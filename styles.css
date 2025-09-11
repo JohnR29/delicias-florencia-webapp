@@ -673,8 +673,6 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     transition: all 0.3s ease;
     cursor: pointer;
     z-index: 3;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .capa-punto:hover {
@@ -688,46 +686,6 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     border-color: var(--primary-color);
     transform: scale(1.3);
     box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
-}
-
-/* Estilos específicos para dispositivos táctiles */
-.formato-visual-container.touch-device .capa-punto {
-    width: 35px;
-    height: 35px;
-    border-width: 3px;
-}
-
-.formato-visual-container.touch-device .capa-punto:before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    border-radius: 50%;
-    background: rgba(76, 239, 17, 0.2);
-    animation: ripple 2s infinite;
-    opacity: 0;
-}
-
-@keyframes ripple {
-    0% {
-        transform: scale(0.8);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1.4);
-        opacity: 0;
-    }
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
 }
 
 /* Posiciones específicas para cada punto */
@@ -749,28 +707,9 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     transition: transform 0.5s ease;
 }
 
-.capa-linea:after {
-    content: '';
-    position: absolute;
-    right: -8px;
-    top: -4px;
-    width: 0;
-    height: 0;
-    border-left: 8px solid var(--primary-color);
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    transition: all 0.5s ease;
-    opacity: 0;
-}
-
 .capa-linea.active {
     transform: scaleX(1);
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.4);
-}
-
-.capa-linea.active:after {
-    opacity: 1;
-    border-left-color: var(--primary-color);
 }
 
 /* Posiciones y tamaños específicos para cada línea */
@@ -822,8 +761,6 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     cursor: pointer;
     transform: scale(0.95);
     opacity: 0.9;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
 }
 
 .capa-etiqueta:hover {
@@ -841,39 +778,6 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
     opacity: 1;
 }
 
-/* Estilos específicos para dispositivos táctiles */
-.formato-visual-container.touch-device .capa-etiqueta {
-    transform: scale(1);
-    opacity: 1;
-    border-width: 2px;
-}
-
-.formato-visual-container.touch-device .capa-etiqueta:before {
-    content: '👆';
-    position: absolute;
-    top: -25px;
-    right: -5px;
-    font-size: 16px;
-    animation: bounce 2s infinite;
-    opacity: 0.7;
-}
-
-.formato-visual-container.touch-device .capa-etiqueta.active:before {
-    display: none;
-}
-
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-    }
-    40% {
-        transform: translateY(-5px);
-    }
-    60% {
-        transform: translateY(-3px);
-    }
-}
-
 .etiqueta-texto {
     display: block;
     padding: 8px 12px;
@@ -888,13 +792,6 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
 
 .capa-etiqueta.active .etiqueta-texto {
     color: var(--primary-color);
-    font-weight: 600;
-}
-
-/* Mejoras para móvil en el texto */
-.formato-visual-container.touch-device .etiqueta-texto {
-    font-size: 14px;
-    padding: 10px 14px;
     font-weight: 600;
 }
 
@@ -984,103 +881,59 @@ section[id] { scroll-margin-top: var(--scroll-offset); }
         height: 320px;
     }
     
-    /* Puntos más grandes en móvil para mejor interacción táctil */
-    .capa-punto {
-        width: 40px;
-        height: 40px;
-        border-width: 3px;
-    }
-    
     /* Ajustar posiciones proporcionalmente para móvil */
-    .capa-punto-1 { left: 108px; top: 265px; }
-    .capa-punto-2 { left: 108px; top: 233px; }
-    .capa-punto-3 { left: 108px; top: 200px; }
-    .capa-punto-4 { left: 108px; top: 161px; }
-    .capa-punto-5 { left: 108px; top: 125px; }
-    .capa-punto-6 { left: 108px; top: 83px; }
+    .capa-punto-1 { left: 113px; top: 270px; }
+    .capa-punto-2 { left: 113px; top: 238px; }
+    .capa-punto-3 { left: 113px; top: 205px; }
+    .capa-punto-4 { left: 113px; top: 166px; }
+    .capa-punto-5 { left: 113px; top: 130px; }
+    .capa-punto-6 { left: 113px; top: 88px; }
     
     /* Líneas conectoras móvil */
-    .capa-linea-1 { left: 148px; top: 285px; width: 82px; }
-    .capa-linea-2 { left: 148px; top: 253px; width: 82px; }
-    .capa-linea-3 { left: 148px; top: 220px; width: 82px; }
-    .capa-linea-4 { left: 148px; top: 181px; width: 82px; }
-    .capa-linea-5 { left: 148px; top: 145px; width: 82px; }
-    .capa-linea-6 { left: 148px; top: 103px; width: 82px; }
+    .capa-linea-1 { left: 143px; top: 285px; width: 82px; }
+    .capa-linea-2 { left: 143px; top: 253px; width: 82px; }
+    .capa-linea-3 { left: 143px; top: 220px; width: 82px; }
+    .capa-linea-4 { left: 143px; top: 181px; width: 82px; }
+    .capa-linea-5 { left: 143px; top: 145px; width: 82px; }
+    .capa-linea-6 { left: 143px; top: 103px; width: 82px; }
     
-    /* Flechas más pequeñas en móvil */
-    .capa-linea:after {
-        right: -6px;
-        top: -3px;
-        border-left: 6px solid var(--primary-color);
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-    }
-    
-    .capa-etiqueta-1 { left: 155px; top: 271px; }
-    .capa-etiqueta-2 { left: 155px; top: 239px; }
-    .capa-etiqueta-3 { left: 155px; top: 206px; }
-    .capa-etiqueta-4 { left: 155px; top: 167px; }
-    .capa-etiqueta-5 { left: 155px; top: 131px; }
-    .capa-etiqueta-6 { left: 155px; top: 89px; }
+    .capa-etiqueta-1 { left: 150px; top: 271px; }
+    .capa-etiqueta-2 { left: 150px; top: 239px; }
+    .capa-etiqueta-3 { left: 150px; top: 206px; }
+    .capa-etiqueta-4 { left: 150px; top: 167px; }
+    .capa-etiqueta-5 { left: 150px; top: 131px; }
+    .capa-etiqueta-6 { left: 150px; top: 89px; }
     
     .etiqueta-texto {
         font-size: 13px;
-        padding: 8px 12px;
-        font-weight: 600;
+        padding: 6px 10px;
     }
     
-    /* Remover animaciones de hover en móvil que puedan causar problemas */
-    .formato-visual-container.touch-device .capa-punto:hover {
-        transform: scale(1);
-        background: rgba(76, 239, 17, 0.5);
-        box-shadow: none;
-    }
-    
-    .formato-visual-container.touch-device .capa-etiqueta:hover {
-        transform: scale(1);
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border-color: #e0e0e0;
+    .capa-punto {
+        width: 24px;
+        height: 24px;
     }
 }
 
 @media (max-width: 480px) {
     .formato-visual-container {
-        transform: scale(0.75);
+        transform: scale(0.7);
         height: 280px;
     }
     
     .etiqueta-texto {
         font-size: 12px;
-        padding: 6px 10px;
-        font-weight: 600;
+        padding: 5px 8px;
     }
     
     .capa-punto {
-        width: 35px;
-        height: 35px;
-        border-width: 2px;
+        width: 20px;
+        height: 20px;
     }
     
     .capa-linea {
-        height: 2px;
+        height: 1.5px;
     }
-    
-    /* Flechas aún más pequeñas en pantallas muy pequeñas */
-    .capa-linea:after {
-        right: -5px;
-        top: -2.5px;
-        border-left: 5px solid var(--primary-color);
-        border-top: 3px solid transparent;
-        border-bottom: 3px solid transparent;
-    }
-    
-    /* Ajustar posiciones para pantallas muy pequeñas */
-    .capa-punto-1 { left: 110px; top: 267px; }
-    .capa-punto-2 { left: 110px; top: 235px; }
-    .capa-punto-3 { left: 110px; top: 202px; }
-    .capa-punto-4 { left: 110px; top: 163px; }
-    .capa-punto-5 { left: 110px; top: 127px; }
-    .capa-punto-6 { left: 110px; top: 85px; }
 }
 
 /* Precios Section */
