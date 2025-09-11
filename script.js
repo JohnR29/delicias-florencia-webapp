@@ -627,3 +627,101 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // (Opcional) Parallax deshabilitado para evitar mareo / rendimiento; si se quiere, habilitar con prefers-reduced-motion check.
+
+// Interacciones para especificaciones de capas
+function configurarEspecificaciones() {
+    const puntos = document.querySelectorAll('.capa-punto');
+    const etiquetas = document.querySelectorAll('.capa-etiqueta');
+    const lineas = document.querySelectorAll('.capa-linea');
+    
+    // Función para activar una capa específica
+    function activarCapa(numeroCapa) {
+        // Remover clases activas de todos los elementos
+        puntos.forEach(p => p.classList.remove('active'));
+        etiquetas.forEach(e => e.classList.remove('active'));
+        lineas.forEach(l => l.classList.remove('active'));
+        
+        // Activar elementos de la capa seleccionada
+        const punto = document.querySelector(`.capa-punto-${numeroCapa}`);
+        const etiqueta = document.querySelector(`.capa-etiqueta-${numeroCapa}`);
+        const linea = document.querySelector(`.capa-linea-${numeroCapa}`);
+        
+        if (punto && etiqueta && linea) {
+            punto.classList.add('active');
+            etiqueta.classList.add('active');
+            linea.classList.add('active');
+        }
+    }
+    
+    // Función para desactivar todas las capas
+    function desactivarCapas() {
+        puntos.forEach(p => p.classList.remove('active'));
+        etiquetas.forEach(e => e.classList.remove('active'));
+        lineas.forEach(l => l.classList.remove('active'));
+    }
+    
+    // Event listeners para puntos
+    puntos.forEach(punto => {
+        const numeroCapa = punto.getAttribute('data-capa');
+        
+        // Hover en punto
+        punto.addEventListener('mouseenter', () => {
+            activarCapa(numeroCapa);
+        });
+        
+        // Click en punto (para móvil y accesibilidad)
+        punto.addEventListener('click', () => {
+            activarCapa(numeroCapa);
+            
+            // Auto-desactivar después de 3 segundos
+            setTimeout(() => {
+                desactivarCapas();
+            }, 3000);
+        });
+    });
+    
+    // Event listeners para etiquetas
+    etiquetas.forEach(etiqueta => {
+        const numeroCapa = etiqueta.getAttribute('data-capa');
+        
+        // Hover en etiqueta
+        etiqueta.addEventListener('mouseenter', () => {
+            activarCapa(numeroCapa);
+        });
+        
+        // Click en etiqueta
+        etiqueta.addEventListener('click', () => {
+            activarCapa(numeroCapa);
+            
+            // Auto-desactivar después de 3 segundos
+            setTimeout(() => {
+                desactivarCapas();
+            }, 3000);
+        });
+    });
+    
+    // Desactivar cuando el mouse sale del contenedor
+    const container = document.querySelector('.formato-visual-container');
+    if (container) {
+        container.addEventListener('mouseleave', () => {
+            desactivarCapas();
+        });
+    }
+    
+    // Animación de líneas al cargar la página
+    setTimeout(() => {
+        lineas.forEach((linea, index) => {
+            setTimeout(() => {
+                linea.style.transform = 'scaleX(0.3)';
+                setTimeout(() => {
+                    linea.style.transform = 'scaleX(0)';
+                }, 500);
+            }, index * 100);
+        });
+    }, 1500);
+}
+
+// Inicializar especificaciones cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+    configurarEspecificaciones();
+});
